@@ -1,55 +1,46 @@
 package dev.yagiz.kulliyat.controller;
 
-import dev.yagiz.kulliyat.entity.Author;
 import dev.yagiz.kulliyat.entity.Book;
-import dev.yagiz.kulliyat.entity.Publisher;
-import dev.yagiz.kulliyat.repository.AuthorRepository;
-import dev.yagiz.kulliyat.repository.BookRepository;
-import dev.yagiz.kulliyat.repository.PublisherRepository;
+import dev.yagiz.kulliyat.service.BookService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/books")
 public class BookController {
 
-    private final BookRepository bookRepository;
-    private final AuthorRepository authorRepository;
-    private final PublisherRepository publisherRepository;
+    private final BookService bookService;
 
-    public BookController(BookRepository bookRepository, AuthorRepository authorRepository, PublisherRepository publisherRepository) {
-        this.bookRepository = bookRepository;
-        this.authorRepository = authorRepository;
-        this.publisherRepository = publisherRepository;
+    public BookController(BookService bookService) {
+        this.bookService = bookService;
     }
 
     @PostMapping
-    public Book createBook(@RequestBody Book book) {
-        // Yayını bul bul
-        if (book.getPublisher() != null && book.getPublisher().getId() != null) {
-            Publisher managedPublisher = publisherRepository.findById(book.getPublisher().getId())
-                .orElseThrow(() -> new RuntimeException("Yayın bulunamadı"));
-            book.setPublisher(managedPublisher);
-        }
-
-        // Verilen ID'lerden yazarları bul
-        if (book.getAuthors() != null && !book.getAuthors().isEmpty()) {
-            List<Author> managedAuthors = new ArrayList<>();
-            for (Author author : book.getAuthors()) {
-                Author managedAuthor = authorRepository.findById(author.getId())
-                    .orElseThrow(() -> new RuntimeException("Geçersiz yazar ID'si belirtildi"));
-                managedAuthors.add(managedAuthor);
-            }
-            book.setAuthors(managedAuthors);
-        }
-
-        return bookRepository.save(book);
+    public ResponseEntity<Book> createBook(@RequestBody Book book) {
+        Book savedBook = bookService.createBook(book);
+        return ResponseEntity.ok(savedBook);
     }
 
     @GetMapping
-    public Iterable<Book> getAllBooks() {
-        return bookRepository.findAll();
+    public ResponseEntity<Iterable<Book>> getAllBooks() {
+        return ResponseEntity.ok(bookService.getAllBooks());
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Book> getBookById(@PathVariable Long id) {
+        Book book = bookService.getBookById(id);
+        return ResponseEntity.ok(book);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Book> updateBook(@PathVariable Long id, @RequestBody Book book) {
+        Book updatedBook = bookService.updateBook(id, book);
+        return ResponseEntity.ok(updatedBook);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteBook(@PathVariable Long id) {
+        bookService.deleteBook(id);
+        return ResponseEntity.noContent().build();
     }
 }
