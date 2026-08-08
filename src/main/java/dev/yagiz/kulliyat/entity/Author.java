@@ -1,5 +1,6 @@
 package dev.yagiz.kulliyat.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +15,7 @@ public class Author {
 
     private String name;
 
+    @JsonIgnore // Serializer sonsuz döngüye girmesin diye json output ederken burayı pas geçiyoruz.
     @ManyToMany(mappedBy = "authors")
     private List<Book> books = new ArrayList<>();
 
