@@ -23,6 +23,7 @@ POST http://localhost:8080/api/books
   "publicationYear": 2021,
   "summary": "Beyaz Zambaklar Ülkesinde, Rus yazar Grigory Petrov tarafından 1923 yılında kaleme alınmış; Finlandiya halkının cehaletten, yoksulluktan ve bataklıklardan kurtulup eğitimle, iradeyle modern bir medeniyet kurma mücadelesini anlatan ilham verici bir eserdir.",
   "genre": "TARIH",
+  "cover_image_url": "https://img.iskultur.com.tr/webp/2021/04/beya-zambaklar-ulkesinde-256x420.jpg",
   "publisher": {
     "id": 1
   },

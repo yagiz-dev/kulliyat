@@ -31,6 +31,9 @@ public class Book {
     @Enumerated(EnumType.STRING)
     private Genre genre;
 
+    @Column(name = "cover_image_url")
+    private String coverImageUrl;
+
     @CreationTimestamp
     @Column(updatable = false)
     private LocalDateTime createdAt;
@@ -131,5 +134,13 @@ public class Book {
 
     public LocalDateTime getUpdatedAt() {
         return updatedAt;
+    }
+
+    public String getCoverImageUrl() {
+        return coverImageUrl;
+    }
+
+    public void setCoverImageUrl(String coverImageUrl) {
+        this.coverImageUrl = coverImageUrl;
     }
 }
