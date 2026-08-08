@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface BookRepository extends JpaRepository {
+public interface BookRepository extends JpaRepository<Book, Long> {
 
     // Anladığım kadarıyla JpaString'i extend ettiğimiz için
     // Spring bazı methodları bize hazır veriyor, o yüzden boş method oluşturuyoruz
