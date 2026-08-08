@@ -64,4 +64,8 @@ public class Book {
     public List<Author> getAuthors() {
         return authors;
     }
+
+    public void setAuthors(List<Author> authors) {
+        this.authors = authors;
+    }
 }
