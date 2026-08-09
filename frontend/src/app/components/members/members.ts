@@ -5,8 +5,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatSelectModule } from '@angular/material/select';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import { apiErrorMessage } from '../../interceptors/api-error';
 import { Member } from '../../models/member';
@@ -17,7 +18,7 @@ import { ExpandableSearchComponent } from '../expandable-search/expandable-searc
 import { FilterMenuComponent } from '../filter-menu/filter-menu';
 import { SortMenuComponent, SortOption } from '../sort-menu/sort-menu';
 
-@Component({ selector: 'app-members', standalone: true, imports: [FormsModule, MatButtonModule, MatFormFieldModule, MatIcon, MatInputModule, MatPaginatorModule, MatSelectModule, ExpandableSearchComponent, FilterMenuComponent, SortMenuComponent, MemberDetailComponent, MemberFormComponent], templateUrl: './members.html', styleUrl: './members.css' })
+@Component({ selector: 'app-members', standalone: true, imports: [FormsModule, MatButtonModule, MatFormFieldModule, MatIcon, MatInputModule, MatMenuModule, MatPaginatorModule, MatSelectModule, RouterLink, ExpandableSearchComponent, FilterMenuComponent, SortMenuComponent, MemberDetailComponent, MemberFormComponent], templateUrl: './members.html', styleUrl: './members.css' })
 export class MembersComponent {
   private readonly memberService = inject(MemberService);
   private readonly route = inject(ActivatedRoute);
@@ -71,7 +72,8 @@ export class MembersComponent {
   changeSort(value: string): void { this.sortBy.set(value); this.currentPage = 0; void this.router.navigate([], { relativeTo: this.route, queryParamsHandling: 'merge', queryParams: { sort: value === 'lastName,asc' ? null : value } }); this.loadMembers(); }
   private syncFilterUrl(): void { void this.router.navigate([], { relativeTo: this.route, queryParamsHandling: 'merge', queryParams: { joinedFrom: this.joinedFrom() || null, joinedTo: this.joinedTo() || null, loanState: this.loanState() || null } }); }
   onPageChange(event: PageEvent): void { this.currentPage = event.pageIndex; this.pageSize = event.pageSize; this.loadMembers(); }
-  initials(member: Member): string { return `${member.firstName.charAt(0)}${member.lastName.charAt(0)}`.toLocaleUpperCase('tr-TR'); }
+  memberState(member: Member): string { return member.overdueLoanCount ? 'Gecikmesi var' : member.activeLoanCount ? 'Ödünçte kitabı var' : 'Uygun'; }
+  memberStateClass(member: Member): string { return member.overdueLoanCount ? 'attention' : member.activeLoanCount ? 'borrowing' : 'clear'; }
   joinedDate(member: Member): string { return new Intl.DateTimeFormat('tr-TR', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date(member.joinedAt)); }
   openCreate(): void { this.editingMember.set(null); this.formOpen.set(true); }
   openEdit(member: Member): void { this.selectedMember.set(null); this.editingMember.set(member); this.formOpen.set(true); }

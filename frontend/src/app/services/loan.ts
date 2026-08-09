@@ -9,8 +9,9 @@ import { Loan, LoanStatus } from '../models/loan';
 export class LoanService {
   private readonly http = inject(HttpClient);
   private readonly url = `${environment.apiUrl}/loans`;
-  list(status: LoanStatus = 'ALL', page = 0, size = 20): Observable<PageResponse<Loan>> {
-    const params = new HttpParams().set('status', status).set('page', page).set('size', size);
+  list(status: LoanStatus = 'ALL', page = 0, size = 20, memberId?: number): Observable<PageResponse<Loan>> {
+    let params = new HttpParams().set('status', status).set('page', page).set('size', size);
+    if (memberId) params = params.set('memberId', memberId);
     return this.http.get<PageResponse<Loan>>(this.url, { params });
   }
   checkout(memberId: number, inventoryNumber: string): Observable<Loan> {

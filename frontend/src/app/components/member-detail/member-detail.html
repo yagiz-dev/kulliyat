@@ -3,7 +3,7 @@
   <div class="detail-body"><div class="member-avatar">{{ initials() }}</div><h2>{{ member.firstName }} {{ member.lastName }}</h2><p>Üye no. {{ member.id }}</p>
     <section class="contact-card"><a [href]="'mailto:' + member.email"><mat-icon>mail</mat-icon><span>{{ member.email }}</span></a>@if (member.phoneNumber) { <a [href]="'tel:' + member.phoneNumber"><mat-icon>phone</mat-icon><span>{{ member.phoneNumber }}</span></a> } @else { <div><mat-icon>phone</mat-icon><span>Telefon belirtilmemiş</span></div> }</section>
     <dl><div><dt>Kayıt tarihi</dt><dd>{{ joinedDate() }}</dd></div><div><dt>Üyelik durumu</dt><dd><span class="active-status">Aktif</span></dd></div></dl>
-    <section class="circulation-note"><mat-icon>history</mat-icon><div><strong>Ödünç geçmişi</strong><p>Üyeye özel geçmiş görünümü sonraki dolaşım geliştirmesinde burada yer alacak.</p></div></section>
+    <section class="circulation-note"><mat-icon>history</mat-icon><div><strong>Toplam {{ member.totalLoanCount }} işlem</strong><p>{{ member.activeLoanCount }} açık · {{ member.overdueLoanCount }} gecikmiş · <a [routerLink]="['/circulation/loans']" [queryParams]="{ status: 'ALL', memberId: member.id }">Geçmişi görüntüle</a></p></div></section>
   </div>
   <footer><a mat-button [routerLink]="['/circulation/checkout']" [queryParams]="{ memberId: member.id }"><mat-icon>arrow_outward</mat-icon>Ödünç ver</a><button mat-flat-button type="button" (click)="edit.emit(member)"><mat-icon>edit</mat-icon>Düzenle</button></footer>
 </aside></div>

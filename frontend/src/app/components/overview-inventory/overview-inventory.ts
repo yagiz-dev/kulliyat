@@ -7,4 +7,5 @@ import { DashboardSummary } from '../../models/dashboard';
 export class OverviewInventoryComponent {
   @Input({ required: true }) summary!: DashboardSummary;
   percent(value: number): number { return this.summary.totalCopies ? Math.round((value / this.summary.totalCopies) * 100) : 0; }
+  currentLoanedCopies(): number { return Math.max(0, this.summary.loanedCopies - this.summary.overdueLoans); }
 }

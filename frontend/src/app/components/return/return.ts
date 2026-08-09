@@ -1,10 +1,10 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, afterNextRender, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { finalize, map, of, switchMap } from 'rxjs';
 import { apiErrorMessage } from '../../interceptors/api-error';
 import { BookCopy } from '../../models/copy';
@@ -16,6 +16,7 @@ import { LoanService } from '../../services/loan';
 export class ReturnComponent {
   private readonly copyService = inject(CopyService);
   private readonly loanService = inject(LoanService);
+  private readonly route = inject(ActivatedRoute);
   readonly inventoryNumber = signal('');
   readonly selectedCopy = signal<BookCopy | null>(null);
   readonly selectedLoan = signal<Loan | null>(null);
@@ -23,6 +24,13 @@ export class ReturnComponent {
   readonly submitting = signal(false);
   readonly error = signal('');
   readonly completedLoan = signal<Loan | null>(null);
+
+  constructor() {
+    afterNextRender(() => {
+      const inventoryNumber = this.route.snapshot.queryParamMap.get('inventoryNumber')?.trim();
+      if (inventoryNumber) { this.inventoryNumber.set(inventoryNumber); this.lookupCopy(); }
+    });
+  }
 
   lookupCopy(): void {
     const inventory = this.inventoryNumber().trim(); if (!inventory) return;
