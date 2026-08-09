@@ -1,0 +1,8 @@
+:host { position: relative; width: 44px; display: block; flex: none; }
+.filter-toggle { position: relative; width: 44px; height: 44px; border: 1px solid var(--border); border-radius: 50%; background: #fff; color: var(--brand-700); }
+.filter-toggle:hover, .filter-toggle.active { border-color: #caa5ae; background: var(--brand-100); }
+.badge { position: absolute; top: -4px; right: -4px; min-width: 18px; height: 18px; padding: 0 4px; box-sizing: border-box; border: 2px solid #fff; border-radius: 999px; display: grid; place-items: center; background: var(--brand-700); color: #fff; font-size: .6rem; font-weight: 700; }
+.filter-panel { position: absolute; z-index: 30; top: 52px; right: 0; width: 340px; overflow: hidden; border: 1px solid var(--border); border-radius: 14px; background: #fff; box-shadow: 0 18px 45px rgb(44 9 18 / 16%); }
+.filter-panel header, .filter-panel footer { min-height: 54px; padding: 0 14px 0 18px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }
+.filter-panel header strong { font-size: .9rem; }.filter-content { padding: 16px 18px; display: grid; gap: 12px; }.filter-panel footer { justify-content: flex-end; gap: 6px; border-top: 1px solid var(--border); border-bottom: 0; background: var(--surface); }.filter-panel footer button { border-radius: 8px; }
+@media (max-width: 720px) { .filter-panel { position: fixed; top: auto; right: 0; bottom: 0; left: 0; width: auto; border-radius: 18px 18px 0 0; } }

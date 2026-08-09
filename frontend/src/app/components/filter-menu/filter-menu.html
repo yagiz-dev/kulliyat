@@ -1,0 +1,10 @@
+<button mat-icon-button class="filter-toggle" type="button" aria-label="Filtreleri aç" [class.active]="activeCount > 0" (click)="toggle()">
+  <mat-icon>tune</mat-icon>@if (activeCount > 0) { <span class="badge">{{ activeCount }}</span> }
+</button>
+@if (open()) {
+  <section class="filter-panel" aria-label="Filtreler">
+    <header><strong>Filtreler</strong><button mat-icon-button type="button" aria-label="Filtreleri kapat" (click)="open.set(false)"><mat-icon>close</mat-icon></button></header>
+    <div class="filter-content"><ng-content /></div>
+    <footer><button mat-button type="button" [disabled]="activeCount === 0" (click)="clearFilters()">Temizle</button><button mat-flat-button type="button" (click)="applyFilters()">Uygula</button></footer>
+  </section>
+}

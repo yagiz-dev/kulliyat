@@ -3,16 +3,23 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { PageResponse } from '../models/api';
-import { Author, Book, BookRequest, Publisher } from '../models/book';
+import { Author, Book, BookRequest, Genre, Publisher } from '../models/book';
+
+export interface BookFilters { genre?: Genre; authorId?: number; publisherId?: number; yearFrom?: number; yearTo?: number; }
 
 @Injectable({ providedIn: 'root' })
 export class BookService {
   private readonly http = inject(HttpClient);
   private readonly url = `${environment.apiUrl}/books`;
 
-  getBooks(search = '', page = 0, size = 10, sortBy = 'title'): Observable<PageResponse<Book>> {
+  getBooks(search = '', page = 0, size = 10, sortBy = 'title', filters: BookFilters = {}): Observable<PageResponse<Book>> {
     let params = new HttpParams().set('page', page).set('size', size).set('sortBy', sortBy);
     if (search) params = params.set('search', search);
+    if (filters.genre) params = params.set('genre', filters.genre);
+    if (filters.authorId) params = params.set('authorId', filters.authorId);
+    if (filters.publisherId) params = params.set('publisherId', filters.publisherId);
+    if (filters.yearFrom) params = params.set('yearFrom', filters.yearFrom);
+    if (filters.yearTo) params = params.set('yearTo', filters.yearTo);
     return this.http.get<PageResponse<Book>>(this.url, { params });
   }
 

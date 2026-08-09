@@ -8,10 +8,12 @@ import { BookCopy, CopyStatus, UpdateCopyRequest } from '../models/copy';
 @Injectable({ providedIn: 'root' })
 export class CopyService {
   private readonly http = inject(HttpClient);
-  list(search = '', status?: CopyStatus, page = 0, size = 20): Observable<PageResponse<BookCopy>> {
+  list(search = '', status?: CopyStatus, page = 0, size = 20, location = '', bookId?: number): Observable<PageResponse<BookCopy>> {
     let params = new HttpParams().set('page', page).set('size', size);
     if (search) params = params.set('search', search);
     if (status) params = params.set('status', status);
+    if (location) params = params.set('location', location);
+    if (bookId) params = params.set('bookId', bookId);
     return this.http.get<PageResponse<BookCopy>>(`${environment.apiUrl}/copies`, { params });
   }
   get(id: number): Observable<BookCopy> { return this.http.get<BookCopy>(`${environment.apiUrl}/copies/${id}`); }

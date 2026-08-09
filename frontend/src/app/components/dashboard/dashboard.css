@@ -6,6 +6,7 @@ h1 { margin: 0 0 8px; font-size: clamp(2.2rem, 4vw, 3.5rem); font-weight: 650; l
 .subtitle { margin: 0; color: var(--muted); }
 .catalog-header .header-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
 .catalog-header .header-actions > button mat-icon { margin-right: 6px; }
+.book-filters { display: grid; gap: 12px; }.book-filters mat-form-field { width: 100%; }.year-range { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .catalog-toolbar { margin-bottom: 28px; padding: 14px; display: flex; align-items: center; justify-content: flex-end; gap: 18px; border: 1px solid var(--border); border-radius: 12px; background: #fff; }
 .toolbar-meta { display: flex; align-items: center; gap: 10px; }
 .toolbar-meta > span { color: var(--muted); font-size: .8rem; white-space: nowrap; }

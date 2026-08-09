@@ -9,9 +9,12 @@ import { Member, MemberRequest } from '../models/member';
 export class MemberService {
   private readonly http = inject(HttpClient);
   private readonly url = `${environment.apiUrl}/members`;
-  list(search = '', page = 0, size = 20): Observable<PageResponse<Member>> {
+  list(search = '', page = 0, size = 20, joinedFrom = '', joinedTo = '', loanState = ''): Observable<PageResponse<Member>> {
     let params = new HttpParams().set('page', page).set('size', size);
     if (search) params = params.set('search', search);
+    if (joinedFrom) params = params.set('joinedFrom', joinedFrom);
+    if (joinedTo) params = params.set('joinedTo', joinedTo);
+    if (loanState) params = params.set('loanState', loanState);
     return this.http.get<PageResponse<Member>>(this.url, { params });
   }
   get(id: number): Observable<Member> { return this.http.get<Member>(`${this.url}/${id}`); }

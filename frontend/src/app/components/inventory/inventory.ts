@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, afterNextRender, inject, signal } from '@angular/core';
+import { Component, afterNextRender, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -7,31 +7,39 @@ import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatSelectModule } from '@angular/material/select';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { finalize } from 'rxjs';
 import { apiErrorMessage } from '../../interceptors/api-error';
-import { BookSummary } from '../../models/book';
+import { Book, BookSummary } from '../../models/book';
 import { BookCopy, CopyStatus } from '../../models/copy';
 import { CopyService } from '../../services/copy';
+import { BookService } from '../../services/book';
 import { CopyDetailComponent } from '../copy-detail/copy-detail';
 import { CopyFormComponent } from '../copy-form/copy-form';
 import { ExpandableSearchComponent } from '../expandable-search/expandable-search';
+import { FilterMenuComponent } from '../filter-menu/filter-menu';
 
 @Component({
   selector: 'app-inventory',
   standalone: true,
-  imports: [CommonModule, FormsModule, CopyDetailComponent, CopyFormComponent, ExpandableSearchComponent, MatButtonModule, MatFormFieldModule, MatIcon, MatInputModule, MatPaginatorModule, MatSelectModule],
+  imports: [CommonModule, FormsModule, CopyDetailComponent, CopyFormComponent, ExpandableSearchComponent, FilterMenuComponent, MatButtonModule, MatFormFieldModule, MatIcon, MatInputModule, MatPaginatorModule, MatSelectModule],
   templateUrl: './inventory.html',
   styleUrl: './inventory.css',
 })
 export class InventoryComponent {
   private readonly copyService = inject(CopyService);
+  private readonly bookService = inject(BookService);
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
 
   readonly copies = signal<BookCopy[]>([]);
   readonly totalCopies = signal(0);
   readonly searchTerm = signal('');
   readonly statusFilter = signal<CopyStatus | ''>('');
+  readonly locationFilter = signal('');
+  readonly bookFilter = signal<number | null>(null);
+  readonly books = signal<Book[]>([]);
+  readonly activeFilterCount = computed(() => [this.statusFilter(), this.locationFilter().trim(), this.bookFilter()].filter(Boolean).length);
   readonly loading = signal(true);
   readonly error = signal('');
   readonly selectedCopy = signal<BookCopy | null>(null);
@@ -50,8 +58,13 @@ export class InventoryComponent {
   ];
 
   constructor() {
+    const query = this.route.snapshot.queryParamMap;
+    this.statusFilter.set((query.get('status') as CopyStatus) || '');
+    this.locationFilter.set(query.get('location') || '');
+    this.bookFilter.set(query.get('bookId') ? Number(query.get('bookId')) : null);
     afterNextRender(() => {
       this.loadCopies();
+      this.bookService.getBooks('', 0, 500).subscribe((response) => this.books.set(response.content));
       if (this.route.snapshot.queryParamMap.get('create') === 'true') this.openCreate();
     });
   }
@@ -59,7 +72,7 @@ export class InventoryComponent {
   loadCopies(): void {
     this.loading.set(true);
     this.error.set('');
-    this.copyService.list(this.searchTerm().trim(), this.statusFilter() || undefined, this.currentPage, this.pageSize)
+    this.copyService.list(this.searchTerm().trim(), this.statusFilter() || undefined, this.currentPage, this.pageSize, this.locationFilter().trim(), this.bookFilter() || undefined)
       .pipe(finalize(() => this.loading.set(false)))
       .subscribe({
         next: (response) => { this.copies.set(response.content); this.totalCopies.set(response.totalElements); },
@@ -67,9 +80,11 @@ export class InventoryComponent {
       });
   }
 
-  search(): void { if (this.searchTerm().trim()) this.statusFilter.set(''); this.currentPage = 0; this.loadCopies(); }
+  search(): void { this.currentPage = 0; this.loadCopies(); }
   clearSearch(): void { this.searchTerm.set(''); this.search(); }
-  changeStatus(status: CopyStatus | ''): void { this.statusFilter.set(status); if (status) this.searchTerm.set(''); this.currentPage = 0; this.loadCopies(); }
+  applyFilters(): void { this.currentPage = 0; this.syncFilterUrl(); this.loadCopies(); }
+  clearFilters(): void { this.statusFilter.set(''); this.locationFilter.set(''); this.bookFilter.set(null); this.applyFilters(); }
+  private syncFilterUrl(): void { void this.router.navigate([], { relativeTo: this.route, queryParamsHandling: 'merge', queryParams: { status: this.statusFilter() || null, location: this.locationFilter().trim() || null, bookId: this.bookFilter() } }); }
   onPageChange(event: PageEvent): void { this.currentPage = event.pageIndex; this.pageSize = event.pageSize; this.loadCopies(); }
 
   statusLabel(status: CopyStatus): string {

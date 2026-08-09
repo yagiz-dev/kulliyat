@@ -1,11 +1,12 @@
-import { Component, afterNextRender, inject, signal } from '@angular/core';
+import { Component, afterNextRender, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
-import { ActivatedRoute } from '@angular/router';
+import { MatSelectModule } from '@angular/material/select';
+import { ActivatedRoute, Router } from '@angular/router';
 import { finalize } from 'rxjs';
 import { apiErrorMessage } from '../../interceptors/api-error';
 import { Member } from '../../models/member';
@@ -13,14 +14,20 @@ import { MemberService } from '../../services/member';
 import { MemberDetailComponent } from '../member-detail/member-detail';
 import { MemberFormComponent } from '../member-form/member-form';
 import { ExpandableSearchComponent } from '../expandable-search/expandable-search';
+import { FilterMenuComponent } from '../filter-menu/filter-menu';
 
-@Component({ selector: 'app-members', standalone: true, imports: [FormsModule, MatButtonModule, MatFormFieldModule, MatIcon, MatInputModule, MatPaginatorModule, ExpandableSearchComponent, MemberDetailComponent, MemberFormComponent], templateUrl: './members.html', styleUrl: './members.css' })
+@Component({ selector: 'app-members', standalone: true, imports: [FormsModule, MatButtonModule, MatFormFieldModule, MatIcon, MatInputModule, MatPaginatorModule, MatSelectModule, ExpandableSearchComponent, FilterMenuComponent, MemberDetailComponent, MemberFormComponent], templateUrl: './members.html', styleUrl: './members.css' })
 export class MembersComponent {
   private readonly memberService = inject(MemberService);
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   readonly members = signal<Member[]>([]);
   readonly totalMembers = signal(0);
   readonly searchTerm = signal('');
+  readonly joinedFrom = signal('');
+  readonly joinedTo = signal('');
+  readonly loanState = signal('');
+  readonly activeFilterCount = computed(() => [this.joinedFrom(), this.joinedTo(), this.loanState()].filter(Boolean).length);
   readonly loading = signal(true);
   readonly error = signal('');
   readonly selectedMember = signal<Member | null>(null);
@@ -31,6 +38,10 @@ export class MembersComponent {
   currentPage = 0;
 
   constructor() {
+    const query = this.route.snapshot.queryParamMap;
+    this.joinedFrom.set(query.get('joinedFrom') || '');
+    this.joinedTo.set(query.get('joinedTo') || '');
+    this.loanState.set(query.get('loanState') || '');
     afterNextRender(() => {
       this.loadMembers();
       if (this.route.snapshot.queryParamMap.get('create') === 'true') this.openCreate();
@@ -39,13 +50,16 @@ export class MembersComponent {
 
   loadMembers(): void {
     this.loading.set(true); this.error.set('');
-    this.memberService.list(this.searchTerm().trim(), this.currentPage, this.pageSize).pipe(finalize(() => this.loading.set(false))).subscribe({
+    this.memberService.list(this.searchTerm().trim(), this.currentPage, this.pageSize, this.joinedFrom(), this.joinedTo(), this.loanState()).pipe(finalize(() => this.loading.set(false))).subscribe({
       next: (response) => { this.members.set(response.content); this.totalMembers.set(response.totalElements); },
       error: (error) => this.error.set(apiErrorMessage(error)),
     });
   }
   search(): void { this.currentPage = 0; this.loadMembers(); }
   clearSearch(): void { this.searchTerm.set(''); this.search(); }
+  applyFilters(): void { this.currentPage = 0; this.syncFilterUrl(); this.loadMembers(); }
+  clearFilters(): void { this.joinedFrom.set(''); this.joinedTo.set(''); this.loanState.set(''); this.applyFilters(); }
+  private syncFilterUrl(): void { void this.router.navigate([], { relativeTo: this.route, queryParamsHandling: 'merge', queryParams: { joinedFrom: this.joinedFrom() || null, joinedTo: this.joinedTo() || null, loanState: this.loanState() || null } }); }
   onPageChange(event: PageEvent): void { this.currentPage = event.pageIndex; this.pageSize = event.pageSize; this.loadMembers(); }
   initials(member: Member): string { return `${member.firstName.charAt(0)}${member.lastName.charAt(0)}`.toLocaleUpperCase('tr-TR'); }
   joinedDate(member: Member): string { return new Intl.DateTimeFormat('tr-TR', { day: '2-digit', month: 'short', year: 'numeric' }).format(new Date(member.joinedAt)); }
