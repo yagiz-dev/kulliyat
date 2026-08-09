@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import dev.yagiz.kulliyat.enums.CopyStatus;
 import org.springframework.data.repository.query.Param;
+import java.util.List;
 
 public interface BookCopyRepository extends JpaRepository<BookCopy, Long> {
 
@@ -16,6 +17,12 @@ public interface BookCopyRepository extends JpaRepository<BookCopy, Long> {
     Page<BookCopy> findByInventoryNumberContainingIgnoreCase(String inventoryNumber, Pageable pageable);
     Page<BookCopy> findByStatus(CopyStatus status, Pageable pageable);
     long countByStatus(CopyStatus status);
+
+    @Query("SELECT c.book.id, COUNT(c), " +
+            "SUM(CASE WHEN c.status = dev.yagiz.kulliyat.enums.CopyStatus.AVAILABLE THEN 1 ELSE 0 END), " +
+            "SUM(CASE WHEN c.status = dev.yagiz.kulliyat.enums.CopyStatus.LOANED THEN 1 ELSE 0 END) " +
+            "FROM BookCopy c WHERE c.book.id IN :bookIds GROUP BY c.book.id")
+    List<Object[]> summarizeByBookIds(@Param("bookIds") List<Long> bookIds);
 
     @Query("SELECT c FROM BookCopy c WHERE " +
             "(:search IS NULL OR LOWER(c.inventoryNumber) LIKE LOWER(CONCAT('%', :search, '%'))) AND " +

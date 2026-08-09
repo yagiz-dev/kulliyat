@@ -7,6 +7,9 @@ import dev.yagiz.kulliyat.entity.Publisher;
 import dev.yagiz.kulliyat.repository.AuthorRepository;
 import dev.yagiz.kulliyat.repository.BookRepository;
 import dev.yagiz.kulliyat.repository.PublisherRepository;
+import dev.yagiz.kulliyat.repository.BookCopyRepository;
+import dev.yagiz.kulliyat.repository.LoanRepository;
+import dev.yagiz.kulliyat.dto.ApiDtos.BookResponse;
 import dev.yagiz.kulliyat.enums.Genre;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,17 +21,25 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.time.LocalDate;
 
 @Service
 public class BookService {
     private final BookRepository bookRepository;
     private final AuthorRepository authorRepository;
     private final PublisherRepository publisherRepository;
+    private final BookCopyRepository bookCopyRepository;
+    private final LoanRepository loanRepository;
 
-    public BookService(BookRepository bookRepository, AuthorRepository authorRepository, PublisherRepository publisherRepository) {
+    public BookService(BookRepository bookRepository, AuthorRepository authorRepository, PublisherRepository publisherRepository,
+                       BookCopyRepository bookCopyRepository, LoanRepository loanRepository) {
         this.bookRepository = bookRepository;
         this.authorRepository = authorRepository;
         this.publisherRepository = publisherRepository;
+        this.bookCopyRepository = bookCopyRepository;
+        this.loanRepository = loanRepository;
     }
 
     public Book createBook(BookRequest request) {
@@ -42,15 +53,30 @@ public class BookService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Book not found"));
     }
 
-    public Page<Book> getBooks(String search, Genre genre, Long authorId, Long publisherId,
-                               Integer yearFrom, Integer yearTo, int page, int size, String sortBy, String sortDirection) {
+    public Page<BookResponse> getBooks(String search, Genre genre, Long authorId, Long publisherId,
+                                       Integer yearFrom, Integer yearTo, int page, int size, String sortBy, String sortDirection) {
         String property = switch (sortBy) {
             case "publicationYear", "createdAt" -> sortBy;
             default -> "title";
         };
         Sort.Direction direction = "desc".equalsIgnoreCase(sortDirection) ? Sort.Direction.DESC : Sort.Direction.ASC;
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, property));
-        return bookRepository.filter(normalize(search), genre, authorId, publisherId, yearFrom, yearTo, pageable);
+        Page<Book> books = bookRepository.filter(normalize(search), genre, authorId, publisherId, yearFrom, yearTo, pageable);
+        List<Long> bookIds = books.getContent().stream().map(Book::getId).toList();
+        Map<Long, long[]> copyCounts = new HashMap<>();
+        Map<Long, Long> overdueCounts = new HashMap<>();
+        if (!bookIds.isEmpty()) {
+            for (Object[] row : bookCopyRepository.summarizeByBookIds(bookIds)) {
+                copyCounts.put((Long) row[0], new long[] { ((Number) row[1]).longValue(), ((Number) row[2]).longValue(), ((Number) row[3]).longValue() });
+            }
+            for (Object[] row : loanRepository.countOverdueLoansByBookIds(bookIds, LocalDate.now())) {
+                overdueCounts.put((Long) row[0], ((Number) row[1]).longValue());
+            }
+        }
+        return books.map(book -> {
+            long[] counts = copyCounts.getOrDefault(book.getId(), new long[] { 0, 0, 0 });
+            return BookResponse.from(book, counts[0], counts[1], counts[2], overdueCounts.getOrDefault(book.getId(), 0L));
+        });
     }
 
     private String normalize(String value) { return value == null || value.isBlank() ? null : value.trim(); }

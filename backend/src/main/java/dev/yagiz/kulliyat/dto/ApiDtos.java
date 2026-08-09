@@ -46,12 +46,21 @@ public final class ApiDtos {
 
     public record BookResponse(Long id, String title, String isbn, Integer publicationYear, String summary, Genre genre,
                                String coverImageUrl, LocalDateTime createdAt, LocalDateTime updatedAt,
-                               PublisherResponse publisher, List<AuthorResponse> authors) {
+                                 PublisherResponse publisher, List<AuthorResponse> authors,
+                                 long totalCopyCount, long availableCopyCount, long loanedCopyCount, long overdueCopyCount) {
         public static BookResponse from(Book book) {
             return new BookResponse(book.getId(), book.getTitle(), book.getIsbn(), book.getPublicationYear(),
                     book.getSummary(), book.getGenre(), book.getCoverImageUrl(), book.getCreatedAt(), book.getUpdatedAt(),
                     book.getPublisher() == null ? null : PublisherResponse.from(book.getPublisher()),
-                    book.getAuthors().stream().map(AuthorResponse::from).toList());
+                      book.getAuthors().stream().map(AuthorResponse::from).toList(), 0, 0, 0, 0);
+          }
+          public static BookResponse from(Book book, long totalCopyCount, long availableCopyCount,
+                                          long loanedCopyCount, long overdueCopyCount) {
+              return new BookResponse(book.getId(), book.getTitle(), book.getIsbn(), book.getPublicationYear(),
+                      book.getSummary(), book.getGenre(), book.getCoverImageUrl(), book.getCreatedAt(), book.getUpdatedAt(),
+                      book.getPublisher() == null ? null : PublisherResponse.from(book.getPublisher()),
+                      book.getAuthors().stream().map(AuthorResponse::from).toList(), totalCopyCount,
+                      availableCopyCount, loanedCopyCount, overdueCopyCount);
         }
     }
 

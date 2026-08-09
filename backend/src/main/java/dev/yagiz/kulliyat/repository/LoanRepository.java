@@ -29,4 +29,8 @@ public interface LoanRepository extends JpaRepository<Loan, Long> {
             "SUM(CASE WHEN l.returnDate IS NULL AND l.dueDate < :today THEN 1 ELSE 0 END), COUNT(l) " +
             "FROM Loan l WHERE l.member.id IN :memberIds GROUP BY l.member.id")
     List<Object[]> countOpenLoansByMemberIds(@Param("memberIds") List<Long> memberIds, @Param("today") LocalDate today);
+
+    @Query("SELECT l.bookCopy.book.id, COUNT(l) FROM Loan l WHERE l.returnDate IS NULL AND l.dueDate < :today " +
+            "AND l.bookCopy.book.id IN :bookIds GROUP BY l.bookCopy.book.id")
+    List<Object[]> countOverdueLoansByBookIds(@Param("bookIds") List<Long> bookIds, @Param("today") LocalDate today);
 }
