@@ -17,16 +17,15 @@ public class AuthorController {
     /**
      * Bu olayı sevdim. Direkt olarak POST body'sini parse ederek
      * parametrelerden entity oluşturabiliyor.
-     *
      * Ama bu RequestBody annotation'unu biraz daha incelemem lazım.
      */
     @PostMapping
     public Author createAuthor(@RequestBody Author author) {
-        return (Author) authorRepository.save(author);
+        return authorRepository.save(author);
     }
 
     @GetMapping
-    public Iterable getAllAuthors() {
+    public Iterable<Author> getAllAuthors() {
         return authorRepository.findAll();
     }
 }

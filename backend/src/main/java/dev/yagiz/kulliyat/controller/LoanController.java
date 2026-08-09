@@ -19,13 +19,13 @@ public class LoanController {
     public record ReturnRequest(String inventoryNumber) {}
 
     @PostMapping("/checkout")
-    public ResponseEntity checkout(@RequestBody CheckoutRequest request) {
+    public ResponseEntity<Loan> checkout(@RequestBody CheckoutRequest request) {
         Loan loan = loanService.checkoutBook(request.memberId(), request.inventoryNumber());
         return ResponseEntity.ok(loan);
     }
 
     @PostMapping("/return")
-    public ResponseEntity returnBook(@RequestBody ReturnRequest request) {
+    public ResponseEntity<Loan> returnBook(@RequestBody ReturnRequest request) {
         Loan loan = loanService.returnBook(request.inventoryNumber());
         return ResponseEntity.ok(loan);
     }

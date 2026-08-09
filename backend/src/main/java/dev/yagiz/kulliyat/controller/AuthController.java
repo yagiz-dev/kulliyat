@@ -26,7 +26,7 @@ public class AuthController {
     public record LoginRequest(String username, String password) {}
 
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody LoginRequest request) {
+    public ResponseEntity<String> login(@RequestBody LoginRequest request) {
         // Verify the password
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.username(), request.password())

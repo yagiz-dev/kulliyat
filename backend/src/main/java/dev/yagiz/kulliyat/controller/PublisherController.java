@@ -17,16 +17,15 @@ public class PublisherController {
     /**
      * Bu olayı sevdim. Direkt olarak POST body'sini parse ederek
      * parametrelerden entity oluşturabiliyor.
-     *
      * Ama bu RequestBody annotation'unu biraz daha incelemem lazım.
      */
     @PostMapping
     public Publisher createPublisher(@RequestBody Publisher publisher) {
-        return (Publisher) publisherRepository.save(publisher);
+        return publisherRepository.save(publisher);
     }
 
     @GetMapping
-    public Iterable getAllPublishers() {
+    public Iterable<Publisher> getAllPublishers() {
         return publisherRepository.findAll();
     }
 }
