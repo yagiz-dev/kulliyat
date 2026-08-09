@@ -87,8 +87,15 @@ public class LoanService {
         return loanRepository.save(activeLoan);
     }
 
-    public Page<Loan> getLoans(LoanStatus status, int page, int size) {
+    public Page<Loan> getLoans(LoanStatus status, Long memberId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "checkoutDate"));
+        if (memberId != null) {
+            return switch (status == null ? LoanStatus.ALL : status) {
+                case ACTIVE -> loanRepository.findByMember_IdAndReturnDateIsNull(memberId, pageable);
+                case OVERDUE -> loanRepository.findByMember_IdAndReturnDateIsNullAndDueDateBefore(memberId, LocalDate.now(), pageable);
+                case ALL -> loanRepository.findByMember_Id(memberId, pageable);
+            };
+        }
         return switch (status == null ? LoanStatus.ALL : status) {
             case ACTIVE -> loanRepository.findByReturnDateIsNull(pageable);
             case OVERDUE -> loanRepository.findByReturnDateIsNullAndDueDateBefore(LocalDate.now(), pageable);

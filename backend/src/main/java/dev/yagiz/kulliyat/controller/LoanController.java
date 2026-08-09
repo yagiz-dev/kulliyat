@@ -20,9 +20,10 @@ public class LoanController {
     @GetMapping
     public ResponseEntity<PageResponse<LoanResponse>> getLoans(
             @RequestParam(defaultValue = "ALL") LoanStatus status,
+            @RequestParam(required = false) Long memberId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
-        return ResponseEntity.ok(PageResponse.from(loanService.getLoans(status, page, size), LoanResponse::from));
+        return ResponseEntity.ok(PageResponse.from(loanService.getLoans(status, memberId, page, size), LoanResponse::from));
     }
 
     @PostMapping("/checkout")

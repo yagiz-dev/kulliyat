@@ -38,7 +38,7 @@ public class DashboardService {
                 memberRepository.count(),
                 loanRepository.countByReturnDateIsNull(),
                 loanRepository.countByReturnDateIsNullAndDueDateBefore(LocalDate.now()),
-                loanRepository.findTop5ByOrderByIdDesc().stream().map(LoanResponse::from).toList()
+                loanRepository.findTop4ByOrderByIdDesc().stream().map(LoanResponse::from).toList()
         );
     }
 }

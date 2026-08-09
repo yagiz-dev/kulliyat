@@ -64,10 +64,14 @@ public final class ApiDtos {
     }
 
     public record MemberResponse(Long id, String firstName, String lastName, String email, String phoneNumber,
-                                 LocalDateTime joinedAt) {
+                                 LocalDateTime joinedAt, long activeLoanCount, long overdueLoanCount, long totalLoanCount) {
         public static MemberResponse from(Member member) {
             return new MemberResponse(member.getId(), member.getFirstName(), member.getLastName(), member.getEmail(),
-                    member.getPhoneNumber(), member.getJoinedAt());
+                    member.getPhoneNumber(), member.getJoinedAt(), 0, 0, 0);
+        }
+        public static MemberResponse from(Member member, long activeLoanCount, long overdueLoanCount, long totalLoanCount) {
+            return new MemberResponse(member.getId(), member.getFirstName(), member.getLastName(), member.getEmail(),
+                    member.getPhoneNumber(), member.getJoinedAt(), activeLoanCount, overdueLoanCount, totalLoanCount);
         }
     }
 
