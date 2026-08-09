@@ -2,6 +2,10 @@ package dev.yagiz.kulliyat.service;
 
 import dev.yagiz.kulliyat.entity.Member;
 import dev.yagiz.kulliyat.repository.MemberRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -23,7 +27,13 @@ public class MemberService {
         return memberRepository.save(member);
     }
 
-    public Iterable<Member> getAllMembers() {
-        return memberRepository.findAll();
+    public Page<Member> getAllMembers(String search, int page, int size, String sortBy) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
+
+        if (search != null && !search.isBlank()) {
+            return memberRepository.searchMembers(search, pageable);
+        }
+
+        return memberRepository.findAll(pageable);
     }
 }

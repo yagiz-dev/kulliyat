@@ -6,6 +6,10 @@ import dev.yagiz.kulliyat.entity.Publisher;
 import dev.yagiz.kulliyat.repository.AuthorRepository;
 import dev.yagiz.kulliyat.repository.BookRepository;
 import dev.yagiz.kulliyat.repository.PublisherRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -54,8 +58,15 @@ public class BookService {
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Kitap bulunamadı"));
     }
 
-    public Iterable<Book> getAllBooks() {
-        return bookRepository.findAll();
+    public Page<Book> getBooks(String searchTitle, int page, int size, String sortBy) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
+
+        if (searchTitle != null && !searchTitle.isBlank()) {
+            return bookRepository.findByTitleContainingIgnoreCase(searchTitle, pageable);
+        }
+
+        // Arama çubuğu boşsa tüm kitapları döndür
+        return bookRepository.findAll(pageable);
     }
 
     public Book updateBook(Long id, Book updatedBook) {
