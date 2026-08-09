@@ -14,9 +14,14 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 @Service
 public class LoanService {
+    public enum LoanStatus { ALL, ACTIVE, OVERDUE }
 
     private final LoanRepository loanRepository;
     private final BookCopyRepository bookCopyRepository;
@@ -80,5 +85,14 @@ public class LoanService {
 
         // Save and return the updated loan record
         return loanRepository.save(activeLoan);
+    }
+
+    public Page<Loan> getLoans(LoanStatus status, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "checkoutDate"));
+        return switch (status == null ? LoanStatus.ALL : status) {
+            case ACTIVE -> loanRepository.findByReturnDateIsNull(pageable);
+            case OVERDUE -> loanRepository.findByReturnDateIsNullAndDueDateBefore(LocalDate.now(), pageable);
+            case ALL -> loanRepository.findAll(pageable);
+        };
     }
 }

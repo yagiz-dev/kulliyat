@@ -1,48 +1,42 @@
 package dev.yagiz.kulliyat.controller;
 
-import dev.yagiz.kulliyat.entity.Book;
+import dev.yagiz.kulliyat.dto.ApiDtos.BookRequest;
+import dev.yagiz.kulliyat.dto.ApiDtos.BookResponse;
+import dev.yagiz.kulliyat.dto.ApiDtos.PageResponse;
 import dev.yagiz.kulliyat.service.BookService;
-import org.springframework.data.domain.Page;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/books")
 public class BookController {
-
     private final BookService bookService;
 
-    public BookController(BookService bookService) {
-        this.bookService = bookService;
-    }
+    public BookController(BookService bookService) { this.bookService = bookService; }
 
     @PostMapping
-    public ResponseEntity<Book> createBook(@RequestBody Book book) {
-        Book savedBook = bookService.createBook(book);
-        return ResponseEntity.ok(savedBook);
+    public ResponseEntity<BookResponse> createBook(@Valid @RequestBody BookRequest request) {
+        return ResponseEntity.ok(BookResponse.from(bookService.createBook(request)));
     }
 
     @GetMapping
-    public ResponseEntity<Page<Book>> getAllBooks(
+    public ResponseEntity<PageResponse<BookResponse>> getAllBooks(
             @RequestParam(required = false) String search,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "title") String sortBy) {
-
-        Page<Book> books = bookService.getBooks(search, page, size, sortBy);
-        return ResponseEntity.ok(books);
+        return ResponseEntity.ok(PageResponse.from(bookService.getBooks(search, page, size, sortBy), BookResponse::from));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Book> getBookById(@PathVariable Long id) {
-        Book book = bookService.getBookById(id);
-        return ResponseEntity.ok(book);
+    public ResponseEntity<BookResponse> getBookById(@PathVariable Long id) {
+        return ResponseEntity.ok(BookResponse.from(bookService.getBookById(id)));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Book> updateBook(@PathVariable Long id, @RequestBody Book book) {
-        Book updatedBook = bookService.updateBook(id, book);
-        return ResponseEntity.ok(updatedBook);
+    public ResponseEntity<BookResponse> updateBook(@PathVariable Long id, @Valid @RequestBody BookRequest request) {
+        return ResponseEntity.ok(BookResponse.from(bookService.updateBook(id, request)));
     }
 
     @DeleteMapping("/{id}")

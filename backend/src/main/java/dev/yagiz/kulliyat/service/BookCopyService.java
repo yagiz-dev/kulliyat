@@ -1,17 +1,21 @@
 package dev.yagiz.kulliyat.service;
 
+import dev.yagiz.kulliyat.dto.ApiDtos.UpdateCopyRequest;
 import dev.yagiz.kulliyat.entity.Book;
 import dev.yagiz.kulliyat.entity.BookCopy;
 import dev.yagiz.kulliyat.enums.CopyStatus;
 import dev.yagiz.kulliyat.repository.BookCopyRepository;
 import dev.yagiz.kulliyat.repository.BookRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class BookCopyService {
-
     private final BookCopyRepository bookCopyRepository;
     private final BookRepository bookRepository;
 
@@ -22,19 +26,37 @@ public class BookCopyService {
 
     public BookCopy addCopyToBook(Long bookId, String physicalLocation) {
         Book book = bookRepository.findById(bookId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Belirtilen kitap kütüphanede bulunamadı"));
-
-        // Calculate the next inventory number
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Book not found"));
         Long nextId = bookCopyRepository.findMaxId() + 1;
-        String generatedBarcode = String.format("TOFAS-KTP-%05d", nextId);
-
-        // Create the physical copy
         BookCopy copy = new BookCopy();
-        copy.setInventoryNumber(generatedBarcode);
+        copy.setInventoryNumber(String.format("TOFAS-KTP-%05d", nextId));
         copy.setPhysicalLocation(physicalLocation);
         copy.setStatus(CopyStatus.AVAILABLE);
         copy.setBook(book);
+        return bookCopyRepository.save(copy);
+    }
 
+    public Page<BookCopy> getCopies(String search, CopyStatus status, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("inventoryNumber"));
+        if (search != null && !search.isBlank()) return bookCopyRepository.findByInventoryNumberContainingIgnoreCase(search, pageable);
+        if (status != null) return bookCopyRepository.findByStatus(status, pageable);
+        return bookCopyRepository.findAll(pageable);
+    }
+
+    public BookCopy getCopy(Long id) {
+        return bookCopyRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Kitap nüshası bulunamadı"));
+    }
+
+    public BookCopy updateCopy(Long id, UpdateCopyRequest request) {
+        BookCopy copy = getCopy(id);
+        if (request.physicalLocation() != null) copy.setPhysicalLocation(request.physicalLocation());
+        if (request.status() != null) {
+            if (copy.getStatus() == CopyStatus.LOANED && request.status() != CopyStatus.LOANED) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Ödünç verilmiş bir kitabın durumunu buradan güncelleyemezsiniz. Lütfen iade al menüsünü kullanınız.");
+            }
+            copy.setStatus(request.status());
+        }
         return bookCopyRepository.save(copy);
     }
 }

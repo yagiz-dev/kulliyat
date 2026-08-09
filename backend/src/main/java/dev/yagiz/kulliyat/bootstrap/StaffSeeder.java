@@ -21,10 +21,10 @@ public class StaffSeeder implements CommandLineRunner {
     public void run(String... args) throws Exception {
         // Çoktan oluşturulmuş bir admin yoksa ilk admini oluştur
         if (staffRepository.findByUsername("yagizhan").isEmpty()) {
-
             Staff admin = new Staff();
             admin.setUsername("yagizhan");
-
+            admin.setFirstName("Yağızhan Burak");
+            admin.setLastName("Yakar");
             admin.setPassword(passwordEncoder.encode("yagizhan123+"));
             admin.setRole("ROLE_ADMIN");
 
