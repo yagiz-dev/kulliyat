@@ -1,0 +1,12 @@
+<div class="detail-backdrop" (mousedown)="close.emit()">
+  <aside class="detail-panel" role="dialog" aria-modal="true" [attr.aria-label]="book.title" (mousedown)="$event.stopPropagation()">
+    <header><p class="eyebrow">Kitap detayları</p><button mat-icon-button type="button" aria-label="Kapat" (click)="close.emit()"><mat-icon>close</mat-icon></button></header>
+    <div class="detail-body">
+      <div class="detail-cover">@if (coverUrl(); as cover) { <img [src]="cover" [alt]="book.title + ' kapağı'" /> } @else { <span>{{ book.title.charAt(0) }}</span> }</div>
+      <h2>{{ book.title }}</h2><p class="detail-authors">{{ authorNames() || 'Yazar belirtilmemiş' }}</p>
+      <dl><div><dt>ISBN</dt><dd>{{ book.isbn }}</dd></div><div><dt>Tür</dt><dd>{{ genreLabel(book.genre) }}</dd></div><div><dt>Yayın yılı</dt><dd>{{ book.publicationYear || '—' }}</dd></div><div><dt>Yayınevi</dt><dd>{{ book.publisher?.name || '—' }}</dd></div></dl>
+      <section class="description"><h3>Açıklama</h3><p>{{ book.summary || 'Bu kitap için açıklama eklenmemiş.' }}</p></section>
+    </div>
+    <footer><button mat-button type="button" class="danger" (click)="remove.emit(book)"><mat-icon>delete</mat-icon>Sil</button><button mat-flat-button type="button" (click)="edit.emit(book)"><mat-icon>edit</mat-icon>Düzenle</button></footer>
+  </aside>
+</div>

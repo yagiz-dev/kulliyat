@@ -1,0 +1,34 @@
+:host { display: block; }
+.login-page { display: grid; min-height: 100vh; box-sizing: border-box; place-items: center; padding: 24px; background: var(--surface); color: var(--text); font-family: var(--font-ui); }
+.login-form { width: min(100%, 880px); }
+.login-card { border-color: var(--border); border-radius: 18px; background: #fff; box-shadow: none; }
+mat-card-content { padding: clamp(28px, 5vw, 48px) !important; }
+.login-grid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(36px, 7vw, 82px); }
+.login-intro { display: flex; flex-direction: column; gap: 42px; }
+.kulliyat-logo { display: block; width: min(100%, 170px); height: auto; }
+.login-intro h1 { margin: 0 0 10px; font-size: 2.35rem; font-weight: 500; line-height: 1.1; letter-spacing: -.035em; }
+.login-intro p { margin: 0; color: var(--muted); font-size: 1rem; }
+.credentials { display: flex; flex-direction: column; gap: 4px; }
+mat-form-field { width: 100%; }
+.error-message { border-radius: 6px; padding: 10px 12px; background: #fceceb; color: #a12d28; font-size: .78rem; }
+.alternative-divider { display: flex; align-items: center; gap: 12px; margin: 5px 0 10px; color: var(--muted); font-size: .7rem; }
+.alternative-divider::before, .alternative-divider::after { height: 1px; flex: 1; background: var(--border); content: ''; }
+.tofas-login { width: 100%; min-height: 44px; background: var(--brand-700) !important; color: #fff !important; font-weight: 650; }
+mat-card-actions { display: flex; justify-content: space-between; gap: 20px; border-top: 1px solid var(--border); padding: 18px 32px !important; }
+.company-logos { display: flex; align-items: center; gap: 11px; }
+.company-logos img { display: block; width: auto; height: 22px; object-fit: contain; }
+.logo-separator { width: 1px; height: 24px; background: #cdbec2; }
+mat-card-actions button { min-width: 92px; background: var(--brand-700) !important; color: #fff !important; }
+mat-card-actions button:disabled { opacity: .55; }
+@media (max-width: 680px) {
+  .login-page { align-items: start; padding: 16px; }
+  .login-grid { grid-template-columns: 1fr; gap: 28px; }
+  .login-intro { gap: 28px; }
+  .credentials { padding-top: 0; }
+  mat-card-actions { padding-inline: 22px !important; }
+}
+@media (max-width: 480px) {
+  mat-card-actions { flex-wrap: wrap; }
+  .company-logos { width: 100%; justify-content: center; }
+  mat-card-actions button { margin-left: auto; }
+}

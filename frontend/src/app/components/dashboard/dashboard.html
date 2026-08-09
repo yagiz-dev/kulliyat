@@ -1,0 +1,67 @@
+<div class="catalog-page">
+  <header class="catalog-header">
+    <div><h1>Kitaplar</h1></div>
+    <button mat-flat-button type="button" (click)="openCreate()"><mat-icon>add</mat-icon>Yeni kitap</button>
+  </header>
+
+  <section class="catalog-toolbar">
+    <form (ngSubmit)="search()" class="search-form">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>Kitap adına göre ara</mat-label>
+        <mat-icon matPrefix>search</mat-icon>
+        <input matInput [value]="searchTerm()" (input)="searchTerm.set($any($event.target).value)" />
+        @if (searchTerm()) { <button mat-icon-button matSuffix type="button" aria-label="Aramayı temizle" (click)="clearSearch()"><mat-icon>close</mat-icon></button> }
+      </mat-form-field>
+      <button mat-stroked-button type="submit">Ara</button>
+    </form>
+
+    <div class="toolbar-meta">
+      <span>{{ totalBooks() }} kitap</span>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>Sırala</mat-label>
+        <mat-select [value]="sortBy()" (valueChange)="changeSort($event)">
+          <mat-option value="title">Kitap adı</mat-option><mat-option value="publicationYear">Yayın yılı</mat-option><mat-option value="createdAt">Eklenme tarihi</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </section>
+
+  @if (error()) { <div class="error-banner"><mat-icon>error_outline</mat-icon><span>{{ error() }}</span><button mat-button type="button" (click)="loadBooks()">Tekrar dene</button></div> }
+
+  @if (loading()) { <section class="catalog-state"><mat-icon>hourglass_top</mat-icon><h2>Kitaplar yükleniyor</h2></section> }
+  @else if (!books().length) {
+    <section class="catalog-state"><mat-icon>menu_book</mat-icon><h2>{{ searchTerm() ? 'Eşleşen kitap bulunamadı' : 'Henüz kitap eklenmemiş' }}</h2><p>{{ searchTerm() ? 'Arama ifadenizi değiştirerek tekrar deneyin.' : 'Kataloğu oluşturmaya ilk kitabınızı ekleyerek başlayın.' }}</p>@if (!searchTerm()) { <button mat-flat-button type="button" (click)="openCreate()">İlk kitabı ekle</button> }</section>
+  } @else {
+    <section class="book-grid" aria-label="Kitap kataloğu">
+      @for (book of books(); track book.id) {
+        <article class="book-card">
+          <button class="cover-frame" type="button" (click)="selectedBook.set(book)" [attr.aria-label]="book.title + ' detaylarını aç'">
+            @if (coverUrl(book); as cover) { <img [src]="cover" [alt]="book.title + ' kapağı'" /> }
+            @else { <span class="cover-placeholder" aria-hidden="true">{{ book.title.charAt(0) }}</span> }
+            <span class="genre-tag">{{ genreLabel(book.genre) }}</span>
+          </button>
+          <div class="book-details">
+            <p class="author">{{ authorNames(book) || 'Yazar belirtilmemiş' }}</p>
+            <button class="title-button" type="button" (click)="selectedBook.set(book)"><h2>{{ book.title }}</h2></button>
+            <div class="book-meta"><span>{{ book.publicationYear || 'Yıl belirtilmemiş' }}</span><span>{{ book.publisher?.name || 'Yayınevi belirtilmemiş' }}</span></div>
+            <div class="card-actions">
+              <button mat-button type="button" (click)="selectedBook.set(book)">Detaylar</button>
+              <button mat-icon-button type="button" aria-label="Kitabı düzenle" (click)="openEdit(book)"><mat-icon>edit</mat-icon></button>
+              <button mat-icon-button type="button" class="danger" aria-label="Kitabı sil" (click)="removeBook(book)"><mat-icon>delete</mat-icon></button>
+            </div>
+          </div>
+        </article>
+      }
+    </section>
+  }
+
+  @if (totalBooks() > pageSize) {
+    <mat-paginator [length]="totalBooks()" [pageIndex]="currentPage" [pageSize]="pageSize" [pageSizeOptions]="[8, 12, 24, 48]" (page)="onPageChange($event)" aria-label="Katalog sayfası"></mat-paginator>
+  }
+</div>
+
+@if (formOpen()) { <app-book-form [book]="editingBook()" [authors]="authors()" [publishers]="publishers()" [submitting]="submitting()" [error]="formError()" (save)="saveBook($event)" (cancel)="closeForm()" /> }
+
+@if (selectedBook(); as book) {
+  <app-book-detail [book]="book" (close)="selectedBook.set(null)" (edit)="openEdit($event)" (remove)="removeBook($event)" />
+}

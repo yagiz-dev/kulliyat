@@ -1,0 +1,54 @@
+<main class="login-page">
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+    <mat-card appearance="outlined" class="login-card">
+      <mat-card-content>
+        <div class="login-grid">
+          <section class="login-intro">
+            <img class="kulliyat-logo" src="kulliyat.png" alt="Külliyat Kütüphane Yönetim Sistemi">
+            <div>
+              <h1>Hoş geldiniz</h1>
+            </div>
+          </section>
+
+          <section class="credentials">
+            <mat-form-field appearance="outline">
+              <mat-label>Kullanıcı adı</mat-label>
+              <input matInput formControlName="username" type="text" autocomplete="username">
+              @if (loginForm.controls.username.touched && loginForm.controls.username.hasError('required')) {
+                <mat-error>Kullanıcı adı gereklidir</mat-error>
+              }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Şifre</mat-label>
+              <input matInput formControlName="password" type="password" autocomplete="current-password">
+              @if (loginForm.controls.password.touched && loginForm.controls.password.hasError('required')) {
+                <mat-error>Şifre gereklidir</mat-error>
+              }
+            </mat-form-field>
+
+            @if (errorMessage) {
+              <div class="error-message">{{ errorMessage }}</div>
+            }
+
+            <div class="alternative-divider"><span>ya da</span></div>
+            <button mat-flat-button type="button" class="tofas-login">
+              TOFAŞ kimliğinizle giriş yapın
+            </button>
+          </section>
+        </div>
+      </mat-card-content>
+
+      <mat-card-actions>
+        <div class="company-logos">
+          <img class="tofas-logo" src="tofas.png" alt="TOFAŞ">
+          <span class="logo-separator" aria-hidden="true"></span>
+          <img class="stellantis-logo" src="stellantis.png" alt="Stellantis">
+        </div>
+        <button mat-flat-button type="submit" [disabled]="loginForm.invalid || isSubmitting()">
+          {{ isSubmitting() ? 'Giriş yapılıyor…' : 'Giriş yap' }}
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </form>
+</main>

@@ -1,0 +1,29 @@
+<div class="members-page">
+  <header class="page-header"><div><h1>Üyeler</h1></div><button mat-flat-button type="button" (click)="openCreate()"><mat-icon>person_add</mat-icon>Yeni üye</button></header>
+
+  @if (savedMember(); as member) { <div class="success-banner"><mat-icon>check_circle</mat-icon><div><strong>Üye kaydı güncellendi</strong><span>{{ member.firstName }} {{ member.lastName }} · Üye no. {{ member.id }}</span></div><button mat-icon-button type="button" aria-label="Kapat" (click)="savedMember.set(null)"><mat-icon>close</mat-icon></button></div> }
+
+  <section class="members-card">
+    <div class="toolbar"><form (ngSubmit)="search()"><mat-form-field appearance="outline" subscriptSizing="dynamic"><mat-label>Ad, soyad veya e-posta ile ara</mat-label><mat-icon matPrefix>search</mat-icon><input matInput [value]="searchTerm()" (input)="searchTerm.set($any($event.target).value)" />@if (searchTerm()) { <button mat-icon-button matSuffix type="button" aria-label="Aramayı temizle" (click)="clearSearch()"><mat-icon>close</mat-icon></button> }</mat-form-field><button mat-stroked-button type="submit">Ara</button></form><span>{{ totalMembers() }} üye</span></div>
+    @if (error()) { <div class="error-banner"><mat-icon>error_outline</mat-icon><span>{{ error() }}</span><button mat-button type="button" (click)="loadMembers()">Tekrar dene</button></div> }
+    @if (loading()) { <div class="state"><mat-icon>hourglass_top</mat-icon><h2>Üyeler yükleniyor</h2></div> }
+    @else if (!members().length) { <div class="state"><mat-icon>people</mat-icon><h2>{{ searchTerm() ? 'Eşleşen üye bulunamadı' : 'Henüz üye kaydı yok' }}</h2><p>{{ searchTerm() ? 'Arama ifadenizi değiştirerek tekrar deneyin.' : 'İlk üyeyi kaydederek başlayın.' }}</p>@if (!searchTerm()) { <button mat-flat-button type="button" (click)="openCreate()">İlk üyeyi ekle</button> }</div> }
+    @else {
+      <div class="member-table" role="table" aria-label="Kütüphane üyeleri">
+        <div class="table-head" role="row"><span>Üye</span><span>İletişim</span><span>Kayıt tarihi</span><span>Üye no.</span><span></span></div>
+        @for (member of members(); track member.id) {
+          <article role="row" (click)="selectedMember.set(member)">
+            <div class="member-cell"><span class="avatar">{{ initials(member) }}</span><span><strong>{{ member.firstName }} {{ member.lastName }}</strong><small>Aktif üye</small></span></div>
+            <div class="contact"><span><mat-icon>mail</mat-icon>{{ member.email }}</span><span><mat-icon>phone</mat-icon>{{ member.phoneNumber || 'Telefon belirtilmemiş' }}</span></div>
+            <span class="joined">{{ joinedDate(member) }}</span><strong class="member-number">#{{ member.id }}</strong>
+            <button mat-icon-button type="button" aria-label="Üyeyi düzenle" (click)="$event.stopPropagation(); openEdit(member)"><mat-icon>edit</mat-icon></button>
+          </article>
+        }
+      </div>
+    }
+    @if (totalMembers() > pageSize) { <mat-paginator [length]="totalMembers()" [pageIndex]="currentPage" [pageSize]="pageSize" [pageSizeOptions]="[10, 20, 40, 80]" (page)="onPageChange($event)" aria-label="Üye dizini sayfası" /> }
+  </section>
+</div>
+
+@if (formOpen()) { <app-member-form [member]="editingMember()" (saved)="memberSaved($event)" (cancel)="formOpen.set(false)" /> }
+@if (selectedMember(); as member) { <app-member-detail [member]="member" (close)="selectedMember.set(null)" (edit)="openEdit($event)" /> }

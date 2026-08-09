@@ -1,0 +1,42 @@
+<div class="dialog-backdrop" (mousedown)="cancel.emit()">
+  <section class="copy-dialog" role="dialog" aria-modal="true" [attr.aria-label]="copy ? 'Nüshayı düzenle' : 'Yeni nüsha'" (mousedown)="$event.stopPropagation()">
+    <header><div><p class="eyebrow">Fiziksel envanter</p><h2>{{ copy ? 'Nüshayı düzenle' : 'Yeni nüsha ekle' }}</h2></div><button mat-icon-button type="button" aria-label="Kapat" (click)="cancel.emit()"><mat-icon>close</mat-icon></button></header>
+
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      @if (!copy) {
+        <section class="book-selector">
+          <h3>1. Kitabı seçin</h3>
+          <div class="book-search"><mat-form-field appearance="outline" subscriptSizing="dynamic"><mat-label>Kitap adına göre ara</mat-label><mat-icon matPrefix>search</mat-icon><input matInput [value]="bookSearch()" (input)="bookSearch.set($any($event.target).value)" (keydown.enter)="$event.preventDefault(); searchBooks()" /></mat-form-field><button mat-stroked-button type="button" [disabled]="!bookSearch().trim()" (click)="searchBooks()">Ara</button></div>
+          @if (bookSearchPerformed()) {
+            @if (loadingBooks()) { <p class="hint">Kitaplar yükleniyor…</p> }
+            @else {
+            <div class="book-options">
+              @for (book of books(); track book.id) {
+                <button type="button" [class.selected]="selectedBook()?.id === book.id" (click)="selectedBook.set(book)">
+                  <span class="book-cover">@if (coverUrl(book); as cover) { <img [src]="cover" alt="" /> } @else { {{ book.title.charAt(0) }} }</span>
+                  <span><strong>{{ book.title }}</strong><small>ISBN {{ book.isbn }}</small></span>
+                  <mat-icon>{{ selectedBook()?.id === book.id ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+                </button>
+              } @empty { <p class="hint">Eşleşen kitap bulunamadı.</p> }
+            </div>
+            }
+          }
+        </section>
+      } @else {
+        <section class="copy-summary"><mat-icon>inventory_2</mat-icon><div><strong>{{ copy.book.title }}</strong><span>{{ copy.inventoryNumber }}</span></div></section>
+      }
+
+      <section class="copy-fields">
+        <h3>{{ copy ? 'Nüsha bilgileri' : '2. Yerleşim bilgisi' }}</h3>
+        <mat-form-field appearance="outline"><mat-label>Fiziksel konum</mat-label><input matInput formControlName="physicalLocation" placeholder="Örn. 2. kat, 4. raf" /></mat-form-field>
+        @if (copy) {
+          <mat-form-field appearance="outline"><mat-label>Durum</mat-label><mat-select formControlName="status" [disabled]="copy.status === 'LOANED'">@for (status of statuses; track status.value) { <mat-option [value]="status.value">{{ status.label }}</mat-option> }</mat-select></mat-form-field>
+          @if (copy.status === 'LOANED') { <p class="loan-note"><mat-icon>info</mat-icon>Ödünçteki nüshanın durumu yalnızca iade işlemiyle değiştirilebilir.</p> }
+        }
+      </section>
+
+      @if (error()) { <p class="form-error">{{ error() }}</p> }
+      <footer><button mat-button type="button" (click)="cancel.emit()">Vazgeç</button><button mat-flat-button type="submit" [disabled]="submitting() || (!copy && !selectedBook())">{{ submitting() ? 'Kaydediliyor…' : 'Kaydet' }}</button></footer>
+    </form>
+  </section>
+</div>

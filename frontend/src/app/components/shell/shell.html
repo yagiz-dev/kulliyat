@@ -1,0 +1,92 @@
+<div class="app-frame">
+  <header class="app-header">
+    <div class="identity-row">
+      <a class="brand" routerLink="/" aria-label="Ana sayfaya git" (click)="closeAccount()">
+        <img src="kulliyat-horizontal.png" alt="Külliyat Kütüphane Yönetim Sistemi" />
+      </a>
+
+      <div class="account-area">
+        <button
+          class="account-trigger"
+          type="button"
+          [attr.aria-expanded]="accountOpen()"
+          aria-haspopup="menu"
+          (click)="toggleAccount()">
+          <span class="avatar" aria-hidden="true">{{ staffInitials() }}</span>
+          <span class="account-copy">
+            <strong>{{ staffName() }}</strong>
+            <small>{{ roleLabel() }}</small>
+          </span>
+          <span class="chevron" [class.open]="accountOpen()" aria-hidden="true"></span>
+        </button>
+
+        @if (accountOpen()) {
+          <div class="account-menu" role="menu">
+            <div class="account-summary">
+              <span class="avatar avatar-large" aria-hidden="true">
+                {{ staffInitials() }}
+              </span>
+              <div>
+                <strong>{{ staffName() }}</strong>
+                <span>{{ roleLabel() }}</span>
+              </div>
+            </div>
+            <button type="button" role="menuitem" (click)="logout()">Sign out</button>
+          </div>
+        }
+      </div>
+    </div>
+
+    <nav class="navigation-row" aria-label="Primary navigation">
+      @for (group of navigation; track group.label) {
+        @for (item of group.items; track item.route || item.label) {
+          @if (!item.adminOnly || isAdmin()) {
+            @if (item.children?.length) {
+              <button
+                class="nav-link nav-menu-trigger"
+                type="button"
+                [class.active]="isNavigationItemActive(item)"
+                [matMenuTriggerFor]="submenu"
+                (click)="closeAccount()">
+                <mat-icon aria-hidden="true">{{ item.icon }}</mat-icon>
+                {{ item.label }}
+                <mat-icon class="menu-chevron" aria-hidden="true">expand_more</mat-icon>
+              </button>
+              <mat-menu #submenu="matMenu">
+                @for (child of item.children; track child.route) {
+                  <a mat-menu-item [routerLink]="child.route">
+                    <mat-icon aria-hidden="true">{{ child.icon }}</mat-icon>
+                    <span>{{ child.label }}</span>
+                  </a>
+                }
+              </mat-menu>
+            } @else {
+              <a
+                class="nav-link"
+                [routerLink]="item.route"
+                routerLinkActive="active"
+                [routerLinkActiveOptions]="{ exact: item.route === '/' }"
+                (click)="closeAccount()">
+                <mat-icon aria-hidden="true">{{ item.icon }}</mat-icon>
+                {{ item.label }}
+              </a>
+            }
+          }
+        }
+      }
+    </nav>
+  </header>
+
+  <main class="route-content" (click)="closeAccount()">
+    <router-outlet />
+  </main>
+
+  <footer class="app-footer">
+    <div class="footer-content">
+      <img class="bit-logo" src="bit.png" alt="TOFAŞ BİT" />
+      <div class="footer-brand" aria-label="Stellantis">
+        <img src="stellantis.png" alt="Stellantis" />
+      </div>
+    </div>
+  </footer>
+</div>

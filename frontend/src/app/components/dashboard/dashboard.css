@@ -1,0 +1,36 @@
+:host { display: block; }
+.catalog-page { max-width: 1360px; margin: 0 auto; padding: clamp(24px, 4vw, 54px); color: var(--text); }
+.catalog-header { margin-bottom: 26px; display: flex; align-items: end; justify-content: space-between; gap: 24px; }
+.eyebrow { margin: 0 0 8px; color: var(--brand-700); font-size: .68rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+h1 { margin: 0 0 8px; font-size: clamp(2.2rem, 4vw, 3.5rem); font-weight: 650; letter-spacing: -.04em; }
+.subtitle { margin: 0; color: var(--muted); }
+.catalog-header > button mat-icon { margin-right: 6px; }
+.catalog-toolbar { margin-bottom: 28px; padding: 14px; display: flex; align-items: center; justify-content: space-between; gap: 18px; border: 1px solid var(--border); border-radius: 12px; background: #fff; }
+.search-form, .toolbar-meta { display: flex; align-items: center; gap: 10px; }
+.search-form mat-form-field { width: min(390px, 48vw); }
+.toolbar-meta > span { color: var(--muted); font-size: .8rem; white-space: nowrap; }
+.toolbar-meta mat-form-field { width: 170px; }
+.book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(205px, 1fr)); gap: 30px 22px; }
+.book-card { min-width: 0; }
+.cover-frame { position: relative; width: 100%; aspect-ratio: 2 / 3; padding: 0; overflow: hidden; border: 0; border-radius: 7px; display: block; background: #eadde1; box-shadow: 0 8px 20px rgb(70 24 35 / 13%); cursor: pointer; }
+.cover-frame:hover { transform: translateY(-3px); box-shadow: 0 12px 25px rgb(70 24 35 / 18%); }
+.cover-frame img, .cover-placeholder { width: 100%; height: 100%; display: block; }
+.cover-frame img { object-fit: cover; }
+.cover-placeholder { display: grid; place-items: center; background: var(--brand-700); color: #fff; font-size: 4.5rem; font-weight: 650; }
+.genre-tag { position: absolute; right: 10px; bottom: 10px; max-width: calc(100% - 20px); padding: 6px 8px; overflow: hidden; border-radius: 999px; background: rgb(44 9 18 / 88%); color: #fff; font-size: .63rem; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+.book-details { padding: 14px 2px 0; }
+.author { overflow: hidden; margin: 0 0 5px; color: var(--brand-700); font-size: .69rem; font-weight: 700; letter-spacing: .06em; text-overflow: ellipsis; text-transform: uppercase; white-space: nowrap; }
+.title-button { width: 100%; padding: 0; border: 0; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.title-button h2 { min-height: 2.35em; margin: 0 0 9px; display: -webkit-box; overflow: hidden; font-size: 1.18rem; font-weight: 650; line-height: 1.16; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.book-meta { min-height: 34px; display: grid; gap: 3px; color: var(--muted); font-size: .73rem; }
+.card-actions { margin-top: 9px; padding-top: 7px; display: flex; align-items: center; border-top: 1px solid var(--border); }
+.card-actions > :first-child { margin-right: auto; }
+.danger { color: #a5132d !important; }
+.catalog-state { min-height: 320px; display: grid; place-content: center; justify-items: center; text-align: center; color: var(--muted); }
+.catalog-state > mat-icon { width: 42px; height: 42px; font-size: 42px; color: var(--brand-700); }
+.catalog-state h2 { margin: 14px 0 6px; color: var(--text); }
+.catalog-state p { margin: 0 0 18px; }
+.error-banner { margin-bottom: 18px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; border-left: 3px solid #a5132d; background: #fff1f3; color: #7d1024; font-size: .82rem; }
+.error-banner button { margin-left: auto; }
+mat-paginator { margin-top: 34px; border-top: 1px solid var(--border); background: transparent; }
+@media (max-width: 720px) { .catalog-header, .catalog-toolbar { align-items: stretch; flex-direction: column; } .search-form, .toolbar-meta { align-items: stretch; } .search-form mat-form-field { width: 100%; } .toolbar-meta mat-form-field { width: 100%; } .book-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 14px; } .card-actions { align-items: start; flex-wrap: wrap; } }

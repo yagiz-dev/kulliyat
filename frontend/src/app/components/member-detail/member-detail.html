@@ -1,0 +1,9 @@
+<div class="detail-backdrop" (mousedown)="close.emit()"><aside class="detail-panel" role="dialog" aria-modal="true" [attr.aria-label]="member.firstName + ' ' + member.lastName" (mousedown)="$event.stopPropagation()">
+  <header><p class="eyebrow">Üye profili</p><button mat-icon-button type="button" aria-label="Kapat" (click)="close.emit()"><mat-icon>close</mat-icon></button></header>
+  <div class="detail-body"><div class="member-avatar">{{ initials() }}</div><h2>{{ member.firstName }} {{ member.lastName }}</h2><p>Üye no. {{ member.id }}</p>
+    <section class="contact-card"><a [href]="'mailto:' + member.email"><mat-icon>mail</mat-icon><span>{{ member.email }}</span></a>@if (member.phoneNumber) { <a [href]="'tel:' + member.phoneNumber"><mat-icon>phone</mat-icon><span>{{ member.phoneNumber }}</span></a> } @else { <div><mat-icon>phone</mat-icon><span>Telefon belirtilmemiş</span></div> }</section>
+    <dl><div><dt>Kayıt tarihi</dt><dd>{{ joinedDate() }}</dd></div><div><dt>Üyelik durumu</dt><dd><span class="active-status">Aktif</span></dd></div></dl>
+    <section class="circulation-note"><mat-icon>history</mat-icon><div><strong>Ödünç geçmişi</strong><p>Üyeye özel geçmiş görünümü sonraki dolaşım geliştirmesinde burada yer alacak.</p></div></section>
+  </div>
+  <footer><a mat-button [routerLink]="['/circulation/checkout']" [queryParams]="{ memberId: member.id }"><mat-icon>arrow_outward</mat-icon>Ödünç ver</a><button mat-flat-button type="button" (click)="edit.emit(member)"><mat-icon>edit</mat-icon>Düzenle</button></footer>
+</aside></div>

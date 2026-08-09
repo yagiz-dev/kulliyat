@@ -1,0 +1,46 @@
+<div class="inventory-page">
+  <header class="page-header">
+    <div><h1>Nüshalar</h1></div>
+    <button mat-flat-button type="button" (click)="openCreate()"><mat-icon>add</mat-icon>Yeni nüsha</button>
+  </header>
+
+  @if (createdCopy(); as copy) {
+    <div class="success-banner"><mat-icon>check_circle</mat-icon><div><strong>Nüsha oluşturuldu</strong><span>Yeni envanter numarası: {{ copy.inventoryNumber }}</span></div><button mat-icon-button type="button" aria-label="Kapat" (click)="createdCopy.set(null)"><mat-icon>close</mat-icon></button></div>
+  }
+
+  <section class="inventory-card">
+    <div class="toolbar">
+      <form (ngSubmit)="search()">
+        <mat-form-field appearance="outline" subscriptSizing="dynamic"><mat-label>Envanter numarasına göre ara</mat-label><mat-icon matPrefix>search</mat-icon><input matInput [value]="searchTerm()" (input)="searchTerm.set($any($event.target).value)" />@if (searchTerm()) { <button mat-icon-button matSuffix type="button" aria-label="Aramayı temizle" (click)="clearSearch()"><mat-icon>close</mat-icon></button> }</mat-form-field>
+        <button mat-stroked-button type="submit">Ara</button>
+      </form>
+      <div><span>{{ totalCopies() }} nüsha</span><mat-form-field appearance="outline" subscriptSizing="dynamic"><mat-label>Durum</mat-label><mat-select [value]="statusFilter()" (valueChange)="changeStatus($event)">@for (status of statuses; track status.value) { <mat-option [value]="status.value">{{ status.label }}</mat-option> }</mat-select></mat-form-field></div>
+    </div>
+
+    @if (error()) { <div class="error-banner"><mat-icon>error_outline</mat-icon><span>{{ error() }}</span><button mat-button type="button" (click)="loadCopies()">Tekrar dene</button></div> }
+    @if (loading()) { <div class="state"><mat-icon>hourglass_top</mat-icon><h2>Envanter yükleniyor</h2></div> }
+    @else if (!copies().length) { <div class="state"><mat-icon>inventory_2</mat-icon><h2>{{ searchTerm() || statusFilter() ? 'Eşleşen nüsha bulunamadı' : 'Henüz fiziksel nüsha eklenmemiş' }}</h2><p>Yeni bir nüsha ekleyerek fiziksel envanteri oluşturmaya başlayın.</p></div> }
+    @else {
+      <div class="copy-table" role="table" aria-label="Fiziksel nüshalar">
+        <div class="table-head" role="row"><span>Envanter no.</span><span>Kitap</span><span>Konum</span><span>Durum</span><span></span></div>
+        @for (copy of copies(); track copy.id) {
+          <article role="row" (click)="selectedCopy.set(copy)">
+            <strong class="inventory-number">{{ copy.inventoryNumber }}</strong>
+            <div class="book-cell"><span class="cover">@if (coverUrl(copy.book); as cover) { <img [src]="cover" alt="" /> } @else { {{ copy.book.title.charAt(0) }} }</span><span><strong>{{ copy.book.title }}</strong><small>ISBN {{ copy.book.isbn }}</small></span></div>
+            <span class="location"><mat-icon>location_on</mat-icon>{{ copy.physicalLocation || 'Konum belirtilmemiş' }}</span>
+            <span class="status" [class]="'status ' + copy.status.toLowerCase()">{{ statusLabel(copy.status) }}</span>
+            <button mat-icon-button type="button" aria-label="Nüsha seçenekleri" (click)="$event.stopPropagation(); openEdit(copy)"><mat-icon>edit</mat-icon></button>
+          </article>
+        }
+      </div>
+    }
+
+    @if (totalCopies() > pageSize) { <mat-paginator [length]="totalCopies()" [pageIndex]="currentPage" [pageSize]="pageSize" [pageSizeOptions]="[10, 20, 40, 80]" (page)="onPageChange($event)" aria-label="Envanter sayfası" /> }
+  </section>
+</div>
+
+@if (formOpen()) { <app-copy-form [copy]="editingCopy()" (saved)="copySaved($event)" (cancel)="closeForm()" /> }
+
+@if (selectedCopy(); as copy) {
+  <app-copy-detail [copy]="copy" (close)="selectedCopy.set(null)" (edit)="openEdit($event)" />
+}

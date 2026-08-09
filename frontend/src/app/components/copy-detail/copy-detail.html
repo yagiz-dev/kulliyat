@@ -1,0 +1,5 @@
+<div class="detail-backdrop" (mousedown)="close.emit()"><aside class="detail-panel" role="dialog" aria-modal="true" [attr.aria-label]="copy.inventoryNumber" (mousedown)="$event.stopPropagation()">
+  <header><p class="eyebrow">Nüsha detayları</p><button mat-icon-button type="button" aria-label="Kapat" (click)="close.emit()"><mat-icon>close</mat-icon></button></header>
+  <div class="detail-body"><div class="large-cover">@if (coverUrl(copy.book); as cover) { <img [src]="cover" [alt]="copy.book.title + ' kapağı'" /> } @else { {{ copy.book.title.charAt(0) }} }</div><h2>{{ copy.book.title }}</h2><p>{{ copy.inventoryNumber }}</p><dl><div><dt>Durum</dt><dd><span class="status" [class]="'status ' + copy.status.toLowerCase()">{{ statusLabel(copy.status) }}</span></dd></div><div><dt>Fiziksel konum</dt><dd>{{ copy.physicalLocation || 'Belirtilmemiş' }}</dd></div><div><dt>ISBN</dt><dd>{{ copy.book.isbn }}</dd></div><div><dt>Kayıt no.</dt><dd>{{ copy.id }}</dd></div></dl></div>
+  <footer><button mat-flat-button type="button" (click)="edit.emit(copy)"><mat-icon>edit</mat-icon>Düzenle</button></footer>
+</aside></div>

@@ -1,0 +1,7 @@
+.module-page { max-width: 760px; margin: 0 auto; padding: clamp(50px, 9vw, 110px) clamp(24px, 5vw, 54px); }
+.module-page > p:first-child { margin: 0 0 10px; color: var(--brand-700); font-size: .68rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+h2 { margin: 0; font-size: clamp(2.3rem, 5vw, 4.5rem); font-weight: 600; line-height: 1; letter-spacing: -.04em; }
+.rule { width: 56px; height: 3px; margin: 28px 0; background: var(--brand-600); }
+h3 { max-width: 620px; margin: 0 0 13px; font-size: 1.25rem; font-weight: 600; line-height: 1.35; }
+.supporting { max-width: 590px; margin: 0 0 28px; color: var(--muted); line-height: 1.6; }
+a { display: inline-block; border-radius: 8px; padding: 10px 14px; background: var(--brand-700); color: white; font-size: .78rem; font-weight: 700; text-decoration: none; }

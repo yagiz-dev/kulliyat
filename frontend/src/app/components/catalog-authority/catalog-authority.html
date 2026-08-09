@@ -1,0 +1,42 @@
+<div class="authority-page">
+  <header class="page-header">
+    <div><h1>{{ title }}</h1></div>
+    <button mat-flat-button type="button" (click)="startCreate()"><mat-icon>add</mat-icon>Yeni {{ singular }}</button>
+  </header>
+
+  <section class="workspace-card">
+    <div class="toolbar">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>{{ title }} içinde ara</mat-label>
+        <mat-icon matPrefix>search</mat-icon>
+        <input matInput [value]="search()" (input)="search.set($any($event.target).value)" />
+      </mat-form-field>
+      <span>{{ filteredRecords().length }} kayıt</span>
+    </div>
+
+    <form class="record-form" [formGroup]="form" (ngSubmit)="save()">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-label>{{ editing() ? singular + ' adını düzenle' : 'Yeni ' + singular + ' adı' }}</mat-label>
+        <input matInput formControlName="name" />
+      </mat-form-field>
+      @if (editing()) { <button mat-button type="button" (click)="cancelEdit()">Vazgeç</button> }
+      <button mat-flat-button type="submit" [disabled]="form.invalid || saving()">{{ editing() ? 'Güncelle' : 'Ekle' }}</button>
+    </form>
+
+    @if (error()) { <p class="error-message">{{ error() }}</p> }
+    @if (loading()) { <div class="state"><mat-icon>hourglass_top</mat-icon><p>Kayıtlar yükleniyor…</p></div> }
+    @else if (!filteredRecords().length) { <div class="state"><mat-icon>{{ icon }}</mat-icon><p>{{ search() ? 'Aramanızla eşleşen kayıt bulunamadı.' : 'Henüz kayıt eklenmemiş.' }}</p></div> }
+    @else {
+      <div class="record-list">
+        @for (record of filteredRecords(); track record.id) {
+          <article>
+            <span class="record-icon"><mat-icon>{{ icon }}</mat-icon></span>
+            <div><strong>{{ record.name }}</strong><small>Kayıt no. {{ record.id }}</small></div>
+            <button mat-icon-button type="button" [attr.aria-label]="record.name + ' kaydını düzenle'" (click)="startEdit(record)"><mat-icon>edit</mat-icon></button>
+            <button mat-icon-button type="button" class="danger" [attr.aria-label]="record.name + ' kaydını sil'" (click)="remove(record)"><mat-icon>delete</mat-icon></button>
+          </article>
+        }
+      </div>
+    }
+  </section>
+</div>

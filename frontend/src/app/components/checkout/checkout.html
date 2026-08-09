@@ -1,0 +1,24 @@
+<div class="circulation-page">
+  <header class="page-header"><div><h1>Ödünç ver</h1></div><a mat-stroked-button routerLink="/circulation/loans"><mat-icon>receipt_long</mat-icon>Aktif işlemler</a></header>
+
+  @if (completedLoan(); as loan) {
+    <section class="success-card"><span class="success-icon"><mat-icon>check</mat-icon></span><p class="eyebrow">İşlem tamamlandı</p><h2>{{ loan.bookCopy.book.title }} ödünç verildi</h2><p><b>{{ loan.member.firstName }} {{ loan.member.lastName }}</b> adına oluşturulan ödünç kaydı <b>{{ formatDate(loan.dueDate) }}</b> tarihinde sona erecek.</p><dl><div><dt>ENVANTER NO.</dt><dd>{{ loan.bookCopy.inventoryNumber }}</dd></div><div><dt>İŞLEMİ YAPAN</dt><dd>{{ loan.issuedBy }}</dd></div><div><dt>ÖDÜNÇ TARİHİ</dt><dd>{{ formatDate(loan.checkoutDate) }}</dd></div><div><dt>SON İADE TARİHİ</dt><dd>{{ formatDate(loan.dueDate) }}</dd></div></dl><div><button mat-flat-button type="button" (click)="reset()">Yeni işlem</button><a mat-button routerLink="/circulation/loans">İşlemleri görüntüle</a></div></section>
+  } @else {
+    <div class="workflow-grid">
+      <section class="workflow-card">
+        <header><span>1</span><div><h2>Üyeyi seçin</h2><p>Ad, soyad veya e-posta ile arayın.</p></div></header>
+        @if (selectedMember(); as member) { <div class="selected-member"><span class="avatar">{{ initials(member) }}</span><div><strong>{{ member.firstName }} {{ member.lastName }}</strong><small>{{ member.email }}</small></div><button mat-button type="button" (click)="selectedMember.set(null)">Değiştir</button></div> }
+        @else { <form class="search-row" (ngSubmit)="searchMembers()"><mat-form-field appearance="outline" subscriptSizing="dynamic"><mat-label>Üye ara</mat-label><mat-icon matPrefix>search</mat-icon><input matInput [value]="memberSearch()" (input)="memberSearch.set($any($event.target).value)" /></mat-form-field><button mat-stroked-button type="submit" [disabled]="!memberSearch().trim()">Ara</button></form>@if (memberSearchPerformed()) { <div class="member-results">@if (loadingMembers()) { <p>Üyeler yükleniyor…</p> } @else { @for (member of members(); track member.id) { <button type="button" (click)="selectMember(member)"><span class="avatar">{{ initials(member) }}</span><span><strong>{{ member.firstName }} {{ member.lastName }}</strong><small>{{ member.email }}</small></span><mat-icon>chevron_right</mat-icon></button> } @empty { <p>Eşleşen üye bulunamadı.</p> } }</div> } }
+      </section>
+
+      <section class="workflow-card" [class.disabled]="!selectedMember()">
+        <header><span>2</span><div><h2>Nüshayı okutun</h2><p>Kitabın üzerindeki envanter numarasını girin.</p></div></header>
+        <form class="inventory-entry" (ngSubmit)="lookupCopy()"><mat-form-field appearance="outline"><mat-label>Envanter numarası</mat-label><mat-icon matPrefix>qr_code_scanner</mat-icon><input matInput [disabled]="!selectedMember()" [value]="inventoryNumber()" (input)="inventoryNumber.set($any($event.target).value); selectedCopy.set(null)" placeholder="TOFAS-KTP-00001" /></mat-form-field><button mat-stroked-button type="submit" [disabled]="!selectedMember() || !inventoryNumber().trim() || checkingCopy()">Kontrol et</button></form>
+        @if (selectedCopy(); as copy) { <div class="copy-result" [class.unavailable]="copy.status !== 'AVAILABLE'"><mat-icon>{{ copy.status === 'AVAILABLE' ? 'check_circle' : 'block' }}</mat-icon><div><strong>{{ copy.book.title }}</strong><span>{{ copy.inventoryNumber }} · {{ copy.physicalLocation || 'Konum belirtilmemiş' }}</span><small>{{ copy.status === 'AVAILABLE' ? 'Ödünç verilebilir' : 'Bu nüsha şu anda ödünç verilemez' }}</small></div></div> }
+      </section>
+
+      <section class="confirmation-card"><div><h2>İşlemi onaylayın</h2><p>Ödünç süresi sistem politikaları gereği 14 gün olarak ayarlanmıştır.</p></div><button mat-flat-button type="button" [disabled]="!selectedMember() || selectedCopy()?.status !== 'AVAILABLE' || submitting()" (click)="checkout()">{{ submitting() ? 'İşleniyor…' : 'Ödünç ver' }}</button></section>
+    </div>
+    @if (error()) { <div class="error-banner"><mat-icon>error_outline</mat-icon>{{ error() }}</div> }
+  }
+</div>
