@@ -2,6 +2,7 @@ package dev.yagiz.kulliyat.controller;
 
 import dev.yagiz.kulliyat.entity.Member;
 import dev.yagiz.kulliyat.service.MemberService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,7 +17,7 @@ public class MemberController {
     }
 
     @PostMapping
-    public ResponseEntity<Member> registerMember(@RequestBody Member member) {
+    public ResponseEntity<Member> registerMember(@Valid @RequestBody Member member) {
         Member savedMember = memberService.registerMember(member);
         return ResponseEntity.ok(savedMember);
     }

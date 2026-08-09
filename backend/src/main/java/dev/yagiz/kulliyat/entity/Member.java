@@ -1,6 +1,8 @@
 package dev.yagiz.kulliyat.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 
@@ -15,12 +17,16 @@ public class Member {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "İsim boş olamaz")
     @Column(nullable = false)
     private String firstName;
 
+    @NotBlank(message = "Soyadı boş olamaz")
     @Column(nullable = false)
     private String lastName;
 
+    @NotBlank(message = "E-posta adresi boş olamaz")
+    @Email(message = "Geçerli bir e-posta adresi giriniz")
     @Column(unique = true, nullable = false)
     private String email;
 
