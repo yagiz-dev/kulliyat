@@ -36,12 +36,12 @@ public class BookCopyService {
         return bookCopyRepository.save(copy);
     }
 
-    public Page<BookCopy> getCopies(String search, CopyStatus status, int page, int size) {
+    public Page<BookCopy> getCopies(String search, CopyStatus status, String location, Long bookId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("inventoryNumber"));
-        if (search != null && !search.isBlank()) return bookCopyRepository.findByInventoryNumberContainingIgnoreCase(search, pageable);
-        if (status != null) return bookCopyRepository.findByStatus(status, pageable);
-        return bookCopyRepository.findAll(pageable);
+        return bookCopyRepository.filter(normalize(search), status, normalize(location), bookId, pageable);
     }
+
+    private String normalize(String value) { return value == null || value.isBlank() ? null : value.trim(); }
 
     public BookCopy getCopy(Long id) {
         return bookCopyRepository.findById(id)

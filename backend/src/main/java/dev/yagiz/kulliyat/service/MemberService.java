@@ -10,6 +10,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import java.time.LocalDate;
 
 @Service
 public class MemberService {
@@ -32,10 +33,14 @@ public class MemberService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Member not found"));
     }
 
-    public Page<Member> getAllMembers(String search, int page, int size, String sortBy) {
+    public Page<Member> getAllMembers(String search, LocalDate joinedFrom, LocalDate joinedTo, String loanState,
+                                      int page, int size, String sortBy) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
-        return search != null && !search.isBlank() ? memberRepository.searchMembers(search, pageable) : memberRepository.findAll(pageable);
+        return memberRepository.filter(normalize(search), joinedFrom == null ? null : joinedFrom.atStartOfDay(),
+                joinedTo == null ? null : joinedTo.plusDays(1).atStartOfDay(), normalize(loanState), LocalDate.now(), pageable);
     }
+
+    private String normalize(String value) { return value == null || value.isBlank() ? null : value.trim(); }
 
     public Member updateMember(Long id, MemberRequest request) {
         Member member = getMember(id);

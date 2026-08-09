@@ -7,6 +7,7 @@ import dev.yagiz.kulliyat.service.MemberService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/api/members")
@@ -23,10 +24,13 @@ public class MemberController {
     @GetMapping
     public ResponseEntity<PageResponse<MemberResponse>> getAllMembers(
             @RequestParam(required = false) String search,
+            @RequestParam(required = false) LocalDate joinedFrom,
+            @RequestParam(required = false) LocalDate joinedTo,
+            @RequestParam(required = false) String loanState,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "lastName") String sortBy) {
-        return ResponseEntity.ok(PageResponse.from(memberService.getAllMembers(search, page, size, sortBy), MemberResponse::from));
+        return ResponseEntity.ok(PageResponse.from(memberService.getAllMembers(search, joinedFrom, joinedTo, loanState, page, size, sortBy), MemberResponse::from));
     }
 
     @GetMapping("/{id}")

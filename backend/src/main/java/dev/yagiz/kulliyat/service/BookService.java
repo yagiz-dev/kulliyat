@@ -7,6 +7,7 @@ import dev.yagiz.kulliyat.entity.Publisher;
 import dev.yagiz.kulliyat.repository.AuthorRepository;
 import dev.yagiz.kulliyat.repository.BookRepository;
 import dev.yagiz.kulliyat.repository.PublisherRepository;
+import dev.yagiz.kulliyat.enums.Genre;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -41,12 +42,13 @@ public class BookService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Book not found"));
     }
 
-    public Page<Book> getBooks(String search, int page, int size, String sortBy) {
+    public Page<Book> getBooks(String search, Genre genre, Long authorId, Long publisherId,
+                               Integer yearFrom, Integer yearTo, int page, int size, String sortBy) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
-        return search != null && !search.isBlank()
-                ? bookRepository.findByTitleContainingIgnoreCase(search, pageable)
-                : bookRepository.findAll(pageable);
+        return bookRepository.filter(normalize(search), genre, authorId, publisherId, yearFrom, yearTo, pageable);
     }
+
+    private String normalize(String value) { return value == null || value.isBlank() ? null : value.trim(); }
 
     public Book updateBook(Long id, BookRequest request) {
         Book book = getBookById(id);

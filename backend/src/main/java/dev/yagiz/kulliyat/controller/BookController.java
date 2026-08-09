@@ -4,6 +4,7 @@ import dev.yagiz.kulliyat.dto.ApiDtos.BookRequest;
 import dev.yagiz.kulliyat.dto.ApiDtos.BookResponse;
 import dev.yagiz.kulliyat.dto.ApiDtos.PageResponse;
 import dev.yagiz.kulliyat.service.BookService;
+import dev.yagiz.kulliyat.enums.Genre;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,10 +24,15 @@ public class BookController {
     @GetMapping
     public ResponseEntity<PageResponse<BookResponse>> getAllBooks(
             @RequestParam(required = false) String search,
+            @RequestParam(required = false) Genre genre,
+            @RequestParam(required = false) Long authorId,
+            @RequestParam(required = false) Long publisherId,
+            @RequestParam(required = false) Integer yearFrom,
+            @RequestParam(required = false) Integer yearTo,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "title") String sortBy) {
-        return ResponseEntity.ok(PageResponse.from(bookService.getBooks(search, page, size, sortBy), BookResponse::from));
+        return ResponseEntity.ok(PageResponse.from(bookService.getBooks(search, genre, authorId, publisherId, yearFrom, yearTo, page, size, sortBy), BookResponse::from));
     }
 
     @GetMapping("/{id}")

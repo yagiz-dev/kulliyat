@@ -26,9 +26,11 @@ public class BookCopyController {
     public ResponseEntity<PageResponse<BookCopyResponse>> getCopies(
             @RequestParam(required = false) String search,
             @RequestParam(required = false) CopyStatus status,
+            @RequestParam(required = false) String location,
+            @RequestParam(required = false) Long bookId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
-        return ResponseEntity.ok(PageResponse.from(bookCopyService.getCopies(search, status, page, size), BookCopyResponse::from));
+        return ResponseEntity.ok(PageResponse.from(bookCopyService.getCopies(search, status, location, bookId, page, size), BookCopyResponse::from));
     }
 
     @GetMapping("/copies/{id}")

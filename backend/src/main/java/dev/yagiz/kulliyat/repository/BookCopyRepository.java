@@ -8,6 +8,7 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import dev.yagiz.kulliyat.enums.CopyStatus;
+import org.springframework.data.repository.query.Param;
 
 public interface BookCopyRepository extends JpaRepository<BookCopy, Long> {
 
@@ -15,6 +16,14 @@ public interface BookCopyRepository extends JpaRepository<BookCopy, Long> {
     Page<BookCopy> findByInventoryNumberContainingIgnoreCase(String inventoryNumber, Pageable pageable);
     Page<BookCopy> findByStatus(CopyStatus status, Pageable pageable);
     long countByStatus(CopyStatus status);
+
+    @Query("SELECT c FROM BookCopy c WHERE " +
+            "(:search IS NULL OR LOWER(c.inventoryNumber) LIKE LOWER(CONCAT('%', :search, '%'))) AND " +
+            "(:status IS NULL OR c.status = :status) AND " +
+            "(:location IS NULL OR LOWER(c.physicalLocation) LIKE LOWER(CONCAT('%', :location, '%'))) AND " +
+            "(:bookId IS NULL OR c.book.id = :bookId)")
+    Page<BookCopy> filter(@Param("search") String search, @Param("status") CopyStatus status,
+                          @Param("location") String location, @Param("bookId") Long bookId, Pageable pageable);
 
     @Query("SELECT COALESCE(MAX(b.id), 0) FROM BookCopy b")
     Long findMaxId();
