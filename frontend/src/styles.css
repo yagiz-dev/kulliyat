@@ -34,7 +34,7 @@ app-checkout .success-card dt { color: var(--muted); font-size: .65rem; text-tra
 app-checkout .search-row > button,
 app-checkout .inventory-entry > button,
 app-members .toolbar form > button,
-app-dashboard .search-form > button,
+app-books .search-form > button,
 app-inventory .toolbar form > button,
 app-copy-form .book-search > button,
 app-catalog-authority .record-form > button {

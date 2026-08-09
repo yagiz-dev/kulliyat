@@ -26,6 +26,7 @@ export class CopyFormComponent implements OnChanges {
   private readonly copyService = inject(CopyService);
 
   @Input() copy: BookCopy | null = null;
+  @Input() initialBookId: number | null = null;
   @Output() saved = new EventEmitter<BookCopy>();
   @Output() cancel = new EventEmitter<void>();
 
@@ -47,10 +48,17 @@ export class CopyFormComponent implements OnChanges {
   ];
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (!changes['copy']) return;
-    this.form.reset({ physicalLocation: this.copy?.physicalLocation ?? '', status: this.copy?.status ?? 'AVAILABLE' });
-    this.selectedBook.set(null);
-    this.error.set('');
+    if (changes['copy']) {
+      this.form.reset({ physicalLocation: this.copy?.physicalLocation ?? '', status: this.copy?.status ?? 'AVAILABLE' });
+      this.selectedBook.set(null);
+      this.error.set('');
+    }
+    if (!this.copy && this.initialBookId && (changes['initialBookId'] || changes['copy'])) {
+      this.loadingBooks.set(true);
+      this.bookService.getBook(this.initialBookId).pipe(finalize(() => this.loadingBooks.set(false))).subscribe({
+        next: (book) => this.selectedBook.set(book), error: (error) => this.error.set(apiErrorMessage(error)),
+      });
+    }
   }
 
   searchBooks(): void {

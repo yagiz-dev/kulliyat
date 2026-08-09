@@ -14,6 +14,10 @@ export interface Book {
   updatedAt: string;
   publisher: Publisher | null;
   authors: Author[];
+  totalCopyCount: number;
+  availableCopyCount: number;
+  loanedCopyCount: number;
+  overdueCopyCount: number;
 }
 
 export interface BookSummary { id: number; title: string; isbn: string; coverImageUrl: string | null; }

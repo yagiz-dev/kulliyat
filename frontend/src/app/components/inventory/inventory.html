@@ -35,7 +35,7 @@
   </section>
 </div>
 
-@if (formOpen()) { <app-copy-form [copy]="editingCopy()" (saved)="copySaved($event)" (cancel)="closeForm()" /> }
+@if (formOpen()) { <app-copy-form [copy]="editingCopy()" [initialBookId]="bookFilter()" (saved)="copySaved($event)" (cancel)="closeForm()" /> }
 
 @if (selectedCopy(); as copy) {
   <app-copy-detail [copy]="copy" (close)="selectedCopy.set(null)" (edit)="openEdit($event)" />

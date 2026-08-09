@@ -14,7 +14,7 @@ export const routes: Routes = [
       { path: 'circulation/checkout', data: { title: 'Ödünç ver' }, loadComponent: () => import('./components/checkout/checkout').then((m) => m.CheckoutComponent) },
       { path: 'circulation/return', data: { title: 'İade al' }, loadComponent: () => import('./components/return/return').then((m) => m.ReturnComponent) },
       { path: 'circulation/loans', data: { title: 'Ödünç işlemleri' }, loadComponent: () => import('./components/loans/loans').then((m) => m.LoansComponent) },
-      { path: 'catalog/books', data: { title: 'Kitaplar' }, loadComponent: () => import('./components/dashboard/dashboard').then((m) => m.DashboardComponent) },
+      { path: 'catalog/books', data: { title: 'Kitaplar' }, loadComponent: () => import('./components/books/books').then((m) => m.BooksComponent) },
       { path: 'catalog/copies', data: { title: 'Nüshalar' }, loadComponent: () => import('./components/inventory/inventory').then((m) => m.InventoryComponent) },
       { path: 'catalog/authors', data: { title: 'Yazarlar', authorityType: 'authors' }, loadComponent: () => import('./components/catalog-authority/catalog-authority').then((m) => m.CatalogAuthorityComponent) },
       { path: 'catalog/publishers', data: { title: 'Yayınevleri', authorityType: 'publishers' }, loadComponent: () => import('./components/catalog-authority/catalog-authority').then((m) => m.CatalogAuthorityComponent) },

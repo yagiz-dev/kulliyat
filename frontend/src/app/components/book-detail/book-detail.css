@@ -11,5 +11,6 @@ h2 { margin: 22px 0 6px; font-size: 1.7rem; line-height: 1.15; }
 dl { margin: 24px 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
 dl div { min-width: 0; } dt { margin-bottom: 4px; color: var(--muted); font-size: .68rem; text-transform: uppercase; } dd { margin: 0; font-size: .86rem; overflow-wrap: anywhere; }
 .description { padding-top: 18px; border-top: 1px solid var(--border); }.description h3 { margin: 0 0 8px; font-size: .9rem; }.description p { margin: 0; color: var(--muted); font-size: .86rem; line-height: 1.55; }
+.inventory-detail { margin-bottom: 20px; padding: 14px; border: 1px solid var(--border); border-radius: 10px; display: flex; align-items: center; gap: 12px; background: var(--surface); }.inventory-detail > div { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 5px 10px; color: var(--muted); font-size: .69rem; }.inventory-detail strong { color: var(--text); }.inventory-detail .overdue, .inventory-detail .overdue strong { color: #9a1b35; }.inventory-detail a { white-space: nowrap; }
 footer { margin-top: auto; padding: 12px 18px; display: flex; justify-content: space-between; border-top: 1px solid var(--border); }
 footer mat-icon { margin-right: 5px; }.danger { color: #a5132d !important; }

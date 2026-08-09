@@ -2,12 +2,13 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
+import { RouterLink } from '@angular/router';
 import { Book, Genre } from '../../models/book';
 
 @Component({
   selector: 'app-book-detail',
   standalone: true,
-  imports: [CommonModule, MatButtonModule, MatIcon],
+  imports: [CommonModule, MatButtonModule, MatIcon, RouterLink],
   templateUrl: './book-detail.html',
   styleUrl: './book-detail.css',
 })

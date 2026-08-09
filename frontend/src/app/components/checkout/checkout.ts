@@ -26,6 +26,7 @@ export class CheckoutComponent {
   readonly selectedMember = signal<Member | null>(null);
   readonly inventoryNumber = signal('');
   readonly selectedCopy = signal<BookCopy | null>(null);
+  readonly preselectedBookId = signal<number | null>(null);
   readonly loadingMembers = signal(false);
   readonly checkingCopy = signal(false);
   readonly submitting = signal(false);
@@ -36,6 +37,8 @@ export class CheckoutComponent {
     afterNextRender(() => {
       const memberId = Number(this.route.snapshot.queryParamMap.get('memberId'));
       if (memberId) this.preselectMember(memberId);
+      const bookId = Number(this.route.snapshot.queryParamMap.get('bookId'));
+      if (bookId) this.preselectBook(bookId);
     });
   }
 
@@ -51,7 +54,8 @@ export class CheckoutComponent {
     this.memberService.list(search, 0, 12).pipe(finalize(() => this.loadingMembers.set(false))).subscribe({ next: (response) => this.members.set(response.content), error: (error) => this.error.set(apiErrorMessage(error)) });
   }
   preselectMember(id: number): void { this.loadingMembers.set(true); this.memberService.get(id).pipe(finalize(() => this.loadingMembers.set(false))).subscribe({ next: (member) => { this.selectedMember.set(member); this.members.set([member]); }, error: (error) => this.error.set(apiErrorMessage(error)) }); }
-  selectMember(member: Member): void { this.selectedMember.set(member); this.selectedCopy.set(null); this.error.set(''); }
+  preselectBook(id: number): void { this.preselectedBookId.set(id); this.checkingCopy.set(true); this.copyService.list('', 'AVAILABLE', 0, 1, '', id).pipe(finalize(() => this.checkingCopy.set(false))).subscribe({ next: (response) => { const copy = response.content[0] ?? null; this.selectedCopy.set(copy); this.inventoryNumber.set(copy?.inventoryNumber ?? ''); if (!copy) this.error.set('Bu kitap için ödünç verilebilir nüsha bulunamadı.'); }, error: (error) => this.error.set(apiErrorMessage(error)) }); }
+  selectMember(member: Member): void { this.selectedMember.set(member); if (!this.preselectedBookId()) this.selectedCopy.set(null); this.error.set(''); }
   initials(member: Member): string { return `${member.firstName.charAt(0)}${member.lastName.charAt(0)}`.toLocaleUpperCase('tr-TR'); }
 
   lookupCopy(): void {
@@ -74,6 +78,6 @@ export class CheckoutComponent {
     this.submitting.set(true); this.error.set('');
     this.loanService.checkout(member.id, copy.inventoryNumber).pipe(finalize(() => this.submitting.set(false))).subscribe({ next: (loan) => this.completedLoan.set(loan), error: (error) => this.error.set(apiErrorMessage(error)) });
   }
-  reset(): void { this.completedLoan.set(null); this.selectedMember.set(null); this.selectedCopy.set(null); this.inventoryNumber.set(''); this.memberSearch.set(''); this.members.set([]); this.memberSearchPerformed.set(false); }
+  reset(): void { this.completedLoan.set(null); this.selectedMember.set(null); this.selectedCopy.set(null); this.preselectedBookId.set(null); this.inventoryNumber.set(''); this.memberSearch.set(''); this.members.set([]); this.memberSearchPerformed.set(false); }
   formatDate(value: string): string { return new Intl.DateTimeFormat('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(`${value}T00:00:00`)); }
 }

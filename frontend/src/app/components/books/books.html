@@ -18,16 +18,25 @@
           <button class="cover-frame" type="button" (click)="selectedBook.set(book)" [attr.aria-label]="book.title + ' detaylarını aç'">
             @if (coverUrl(book); as cover) { <img [src]="cover" [alt]="book.title + ' kapağı'" /> }
             @else { <span class="cover-placeholder" aria-hidden="true">{{ book.title.charAt(0) }}</span> }
+            <span [class]="'availability-tag ' + availabilityClass(book)">{{ availabilityLabel(book) }}</span>
             <span class="genre-tag">{{ genreLabel(book.genre) }}</span>
           </button>
           <div class="book-details">
             <p class="author">{{ authorNames(book) || 'Yazar belirtilmemiş' }}</p>
             <button class="title-button" type="button" (click)="selectedBook.set(book)"><h2>{{ book.title }}</h2></button>
-            <div class="book-meta"><span>{{ book.publicationYear || 'Yıl belirtilmemiş' }}</span><span>{{ book.publisher?.name || 'Yayınevi belirtilmemiş' }}</span></div>
+            <div class="book-meta"><span>{{ book.publicationYear || 'Yıl belirtilmemiş' }} · {{ book.publisher?.name || 'Yayınevi belirtilmemiş' }}</span><span>ISBN {{ book.isbn }}</span></div>
+            <div class="inventory-summary"><span><strong>{{ book.totalCopyCount }}</strong> nüsha</span><span class="available-count"><strong>{{ book.availableCopyCount }}</strong> mevcut</span><span><strong>{{ currentLoanCount(book) }}</strong> ödünçte</span><span [class.overdue-count]="book.overdueCopyCount"><strong>{{ book.overdueCopyCount }}</strong> gecikmiş</span></div>
             <div class="card-actions">
               <button mat-button type="button" (click)="selectedBook.set(book)">Detaylar</button>
-              <button mat-icon-button type="button" aria-label="Kitabı düzenle" (click)="openEdit(book)"><mat-icon>edit</mat-icon></button>
-              <button mat-icon-button type="button" class="danger" aria-label="Kitabı sil" (click)="removeBook(book)"><mat-icon>delete</mat-icon></button>
+              <button mat-icon-button type="button" aria-label="Kitap işlemleri" [matMenuTriggerFor]="bookMenu"><mat-icon>more_vert</mat-icon></button>
+              <mat-menu #bookMenu="matMenu">
+                <button mat-menu-item type="button" (click)="selectedBook.set(book)"><mat-icon>menu_book</mat-icon><span>Kitap detayları</span></button>
+                <a mat-menu-item routerLink="/catalog/copies" [queryParams]="{ bookId: book.id }"><mat-icon>inventory_2</mat-icon><span>Nüshaları görüntüle</span></a>
+                <a mat-menu-item routerLink="/catalog/copies" [queryParams]="{ create: 'true', bookId: book.id }"><mat-icon>add_box</mat-icon><span>Yeni nüsha ekle</span></a>
+                <a mat-menu-item routerLink="/circulation/checkout" [queryParams]="{ bookId: book.id }" [class.disabled-action]="book.availableCopyCount === 0"><mat-icon>arrow_outward</mat-icon><span>Ödünç ver</span></a>
+                <button mat-menu-item type="button" (click)="openEdit(book)"><mat-icon>edit</mat-icon><span>Kitabı düzenle</span></button>
+                <button mat-menu-item type="button" class="danger" (click)="removeBook(book)"><mat-icon>delete</mat-icon><span>Kitabı sil</span></button>
+              </mat-menu>
             </div>
           </div>
         </article>

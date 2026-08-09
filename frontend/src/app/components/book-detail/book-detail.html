@@ -5,6 +5,7 @@
       <div class="detail-cover">@if (coverUrl(); as cover) { <img [src]="cover" [alt]="book.title + ' kapağı'" /> } @else { <span>{{ book.title.charAt(0) }}</span> }</div>
       <h2>{{ book.title }}</h2><p class="detail-authors">{{ authorNames() || 'Yazar belirtilmemiş' }}</p>
       <dl><div><dt>ISBN</dt><dd>{{ book.isbn }}</dd></div><div><dt>Tür</dt><dd>{{ genreLabel(book.genre) }}</dd></div><div><dt>Yayın yılı</dt><dd>{{ book.publicationYear || '—' }}</dd></div><div><dt>Yayınevi</dt><dd>{{ book.publisher?.name || '—' }}</dd></div></dl>
+      <section class="inventory-detail"><div><span><strong>{{ book.totalCopyCount }}</strong> toplam nüsha</span><span><strong>{{ book.availableCopyCount }}</strong> mevcut</span><span><strong>{{ book.loanedCopyCount }}</strong> ödünçte</span><span class="overdue"><strong>{{ book.overdueCopyCount }}</strong> gecikmiş</span></div><a mat-stroked-button routerLink="/catalog/copies" [queryParams]="{ bookId: book.id }">Nüshaları aç</a></section>
       <section class="description"><h3>Açıklama</h3><p>{{ book.summary || 'Bu kitap için açıklama eklenmemiş.' }}</p></section>
     </div>
     <footer><button mat-button type="button" class="danger" (click)="remove.emit(book)"><mat-icon>delete</mat-icon>Sil</button><button mat-flat-button type="button" (click)="edit.emit(book)"><mat-icon>edit</mat-icon>Düzenle</button></footer>

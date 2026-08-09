@@ -17,14 +17,17 @@ h1 { margin: 0 0 8px; font-size: clamp(2.2rem, 4vw, 3.5rem); font-weight: 650; l
 .cover-frame img { object-fit: cover; }
 .cover-placeholder { display: grid; place-items: center; background: var(--brand-700); color: #fff; font-size: 4.5rem; font-weight: 650; }
 .genre-tag { position: absolute; right: 10px; bottom: 10px; max-width: calc(100% - 20px); padding: 6px 8px; overflow: hidden; border-radius: 999px; background: rgb(44 9 18 / 88%); color: #fff; font-size: .63rem; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+.availability-tag { position: absolute; top: 10px; left: 10px; padding: 5px 7px; border-radius: 999px; font-size: .61rem; font-weight: 700; }.availability-tag.available { background: #e8f5ec; color: #28643b; }.availability-tag.unavailable { background: #fff1f3; color: #8b1730; }.availability-tag.empty { background: #eee; color: #555; }
 .book-details { padding: 14px 2px 0; }
 .author { overflow: hidden; margin: 0 0 5px; color: var(--brand-700); font-size: .69rem; font-weight: 700; letter-spacing: .06em; text-overflow: ellipsis; text-transform: uppercase; white-space: nowrap; }
 .title-button { width: 100%; padding: 0; border: 0; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer; }
 .title-button h2 { min-height: 2.35em; margin: 0 0 9px; display: -webkit-box; overflow: hidden; font-size: 1.18rem; font-weight: 650; line-height: 1.16; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
 .book-meta { min-height: 34px; display: grid; gap: 3px; color: var(--muted); font-size: .73rem; }
+.inventory-summary { margin-top: 10px; padding: 9px 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px 8px; border-top: 1px solid var(--border); color: var(--muted); font-size: .66rem; }.inventory-summary span { white-space: nowrap; }.inventory-summary strong { color: var(--text); }.inventory-summary .available-count, .inventory-summary .available-count strong { color: #28643b; }.inventory-summary .overdue-count, .inventory-summary .overdue-count strong { color: #9a1b35; }
 .card-actions { margin-top: 9px; padding-top: 7px; display: flex; align-items: center; border-top: 1px solid var(--border); }
 .card-actions > :first-child { margin-right: auto; }
 .danger { color: #a5132d !important; }
+.disabled-action { pointer-events: none; opacity: .45; }
 .catalog-state { min-height: 320px; display: grid; place-content: center; justify-items: center; text-align: center; color: var(--muted); }
 .catalog-state > mat-icon { width: 42px; height: 42px; font-size: 42px; color: var(--brand-700); }
 .catalog-state h2 { margin: 14px 0 6px; color: var(--text); }

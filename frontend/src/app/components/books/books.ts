@@ -6,8 +6,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatSelectModule } from '@angular/material/select';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { finalize, forkJoin } from 'rxjs';
 import { apiErrorMessage } from '../../interceptors/api-error';
 import { Author, Book, BookRequest, Genre, Publisher } from '../../models/book';
@@ -19,13 +20,13 @@ import { FilterMenuComponent } from '../filter-menu/filter-menu';
 import { SortMenuComponent, SortOption } from '../sort-menu/sort-menu';
 
 @Component({
-  selector: 'app-dashboard',
+  selector: 'app-books',
   standalone: true,
-  imports: [CommonModule, FormsModule, BookDetailComponent, BookFormComponent, ExpandableSearchComponent, FilterMenuComponent, SortMenuComponent, MatButtonModule, MatFormFieldModule, MatIcon, MatInputModule, MatPaginatorModule, MatSelectModule],
-  templateUrl: './dashboard.html',
-  styleUrl: './dashboard.css',
+  imports: [CommonModule, FormsModule, BookDetailComponent, BookFormComponent, ExpandableSearchComponent, FilterMenuComponent, SortMenuComponent, MatButtonModule, MatFormFieldModule, MatIcon, MatInputModule, MatMenuModule, MatPaginatorModule, MatSelectModule, RouterLink],
+  templateUrl: './books.html',
+  styleUrl: './books.css',
 })
-export class DashboardComponent {
+export class BooksComponent {
   private readonly bookService = inject(BookService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
@@ -88,6 +89,10 @@ export class DashboardComponent {
   genreLabel(genre: Genre): string {
     return ({ KURGU: 'Kurgu', KURGU_DISI: 'Kurgu dışı', BILIMKURGU: 'Bilimkurgu', FANTASTIK: 'Fantastik', GIZEM: 'Gizem', TARIH: 'Tarih', BIYOGRAFI: 'Biyografi', TEKNOLOJI: 'Teknoloji' })[genre];
   }
+
+  availabilityLabel(book: Book): string { return book.totalCopyCount === 0 ? 'Nüsha yok' : book.availableCopyCount > 0 ? 'Mevcut' : 'Mevcut nüsha yok'; }
+  availabilityClass(book: Book): string { return book.totalCopyCount === 0 ? 'empty' : book.availableCopyCount > 0 ? 'available' : 'unavailable'; }
+  currentLoanCount(book: Book): number { return Math.max(0, book.loanedCopyCount - book.overdueCopyCount); }
 
   loadBooks(): void {
     this.loading.set(true);

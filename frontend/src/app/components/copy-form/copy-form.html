@@ -6,6 +6,7 @@
       @if (!copy) {
         <section class="book-selector">
           <h3>1. Kitabı seçin</h3>
+          @if (selectedBook(); as selected) { <div class="selected-book"><span class="book-cover">@if (coverUrl(selected); as cover) { <img [src]="cover" alt="" /> } @else { {{ selected.title.charAt(0) }} }</span><span><strong>{{ selected.title }}</strong><small>ISBN {{ selected.isbn }}</small></span><mat-icon>check_circle</mat-icon></div> }
           <div class="book-search"><mat-form-field appearance="outline" subscriptSizing="dynamic"><mat-label>Kitap adına göre ara</mat-label><mat-icon matPrefix>search</mat-icon><input matInput [value]="bookSearch()" (input)="bookSearch.set($any($event.target).value)" (keydown.enter)="$event.preventDefault(); searchBooks()" /></mat-form-field><button mat-stroked-button type="button" [disabled]="!bookSearch().trim()" (click)="searchBooks()">Ara</button></div>
           @if (bookSearchPerformed()) {
             @if (loadingBooks()) { <p class="hint">Kitaplar yükleniyor…</p> }
