@@ -20,23 +20,19 @@ public class BookCopyService {
         this.bookRepository = bookRepository;
     }
 
-    public BookCopy addCopyToBook(Long bookId, String inventoryNumber, String physicalLocation) {
-        // Ensure the parent catalog book actually exists
+    public BookCopy addCopyToBook(Long bookId, String physicalLocation) {
         Book book = bookRepository.findById(bookId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Kitaplıkta belirtilen kitap bulunamadı"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Belirtilen kitap kütüphanede bulunamadı"));
 
-        // Ensure the barcode isn't already stuck to another book
-        if (bookCopyRepository.existsByInventoryNumber(inventoryNumber)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Bu envanter barkodu zaten başka bir kitapta kullanımda.");
-        }
+        // Calculate the next inventory number
+        Long nextId = bookCopyRepository.findMaxId() + 1;
+        String generatedBarcode = String.format("TOFAS-KTP-%05d", nextId);
 
         // Create the physical copy
         BookCopy copy = new BookCopy();
-        copy.setInventoryNumber(inventoryNumber);
+        copy.setInventoryNumber(generatedBarcode);
         copy.setPhysicalLocation(physicalLocation);
         copy.setStatus(CopyStatus.AVAILABLE);
-
-        // Link it to the parent catalog entry
         copy.setBook(book);
 
         return bookCopyRepository.save(copy);

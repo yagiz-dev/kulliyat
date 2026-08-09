@@ -11,7 +11,7 @@ public class BookCopy {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // örn. "TOFAS-KTP-2026-0001". Kitabın arkasındaki takip barkodu
+    // örn. "TOFAS-KTP-00060". Kitabın arkasındaki takip barkodu
     @Column(unique = true, nullable = false)
     private String inventoryNumber;
 

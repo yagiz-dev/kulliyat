@@ -15,11 +15,11 @@ public class BookCopyController {
         this.bookCopyService = bookCopyService;
     }
 
-    public record AddCopyRequest(String inventoryNumber, String physicalLocation) {}
+    public record AddCopyRequest(String physicalLocation) {}
 
     @PostMapping
     public ResponseEntity<BookCopy> addCopy(@PathVariable Long bookId, @RequestBody AddCopyRequest request) {
-        BookCopy newCopy = bookCopyService.addCopyToBook(bookId, request.inventoryNumber(), request.physicalLocation());
+        BookCopy newCopy = bookCopyService.addCopyToBook(bookId, request.physicalLocation());
         return ResponseEntity.ok(newCopy);
     }
 }
