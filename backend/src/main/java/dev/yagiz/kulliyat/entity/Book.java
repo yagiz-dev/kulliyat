@@ -53,6 +53,9 @@ public class Book {
     )
     private List<Author> authors = new ArrayList<>();
 
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BookCopy> copies = new ArrayList<>();
+
     public void addAuthor(Author author) {
         this.authors.add(author);
         author.getBooks().add(this);
