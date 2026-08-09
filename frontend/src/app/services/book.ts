@@ -12,8 +12,8 @@ export class BookService {
   private readonly http = inject(HttpClient);
   private readonly url = `${environment.apiUrl}/books`;
 
-  getBooks(search = '', page = 0, size = 10, sortBy = 'title', filters: BookFilters = {}): Observable<PageResponse<Book>> {
-    let params = new HttpParams().set('page', page).set('size', size).set('sortBy', sortBy);
+  getBooks(search = '', page = 0, size = 10, sortBy = 'title', filters: BookFilters = {}, sortDirection = 'asc'): Observable<PageResponse<Book>> {
+    let params = new HttpParams().set('page', page).set('size', size).set('sortBy', sortBy).set('sortDirection', sortDirection);
     if (search) params = params.set('search', search);
     if (filters.genre) params = params.set('genre', filters.genre);
     if (filters.authorId) params = params.set('authorId', filters.authorId);

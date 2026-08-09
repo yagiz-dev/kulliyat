@@ -15,8 +15,9 @@ import { MemberDetailComponent } from '../member-detail/member-detail';
 import { MemberFormComponent } from '../member-form/member-form';
 import { ExpandableSearchComponent } from '../expandable-search/expandable-search';
 import { FilterMenuComponent } from '../filter-menu/filter-menu';
+import { SortMenuComponent, SortOption } from '../sort-menu/sort-menu';
 
-@Component({ selector: 'app-members', standalone: true, imports: [FormsModule, MatButtonModule, MatFormFieldModule, MatIcon, MatInputModule, MatPaginatorModule, MatSelectModule, ExpandableSearchComponent, FilterMenuComponent, MemberDetailComponent, MemberFormComponent], templateUrl: './members.html', styleUrl: './members.css' })
+@Component({ selector: 'app-members', standalone: true, imports: [FormsModule, MatButtonModule, MatFormFieldModule, MatIcon, MatInputModule, MatPaginatorModule, MatSelectModule, ExpandableSearchComponent, FilterMenuComponent, SortMenuComponent, MemberDetailComponent, MemberFormComponent], templateUrl: './members.html', styleUrl: './members.css' })
 export class MembersComponent {
   private readonly memberService = inject(MemberService);
   private readonly route = inject(ActivatedRoute);
@@ -27,6 +28,12 @@ export class MembersComponent {
   readonly joinedFrom = signal('');
   readonly joinedTo = signal('');
   readonly loanState = signal('');
+  readonly sortBy = signal('lastName,asc');
+  readonly sortOptions: SortOption[] = [
+    { value: 'lastName,asc', label: 'Soyadı (A–Z)' }, { value: 'lastName,desc', label: 'Soyadı (Z–A)' },
+    { value: 'joinedAt,desc', label: 'En yeni kayıtlar' }, { value: 'joinedAt,asc', label: 'En eski kayıtlar' },
+    { value: 'id,desc', label: 'Üye no. (azalan)' },
+  ];
   readonly activeFilterCount = computed(() => [this.joinedFrom(), this.joinedTo(), this.loanState()].filter(Boolean).length);
   readonly loading = signal(true);
   readonly error = signal('');
@@ -42,6 +49,7 @@ export class MembersComponent {
     this.joinedFrom.set(query.get('joinedFrom') || '');
     this.joinedTo.set(query.get('joinedTo') || '');
     this.loanState.set(query.get('loanState') || '');
+    this.sortBy.set(query.get('sort') || 'lastName,asc');
     afterNextRender(() => {
       this.loadMembers();
       if (this.route.snapshot.queryParamMap.get('create') === 'true') this.openCreate();
@@ -50,7 +58,8 @@ export class MembersComponent {
 
   loadMembers(): void {
     this.loading.set(true); this.error.set('');
-    this.memberService.list(this.searchTerm().trim(), this.currentPage, this.pageSize, this.joinedFrom(), this.joinedTo(), this.loanState()).pipe(finalize(() => this.loading.set(false))).subscribe({
+    const [sortBy, sortDirection] = this.sortBy().split(',');
+    this.memberService.list(this.searchTerm().trim(), this.currentPage, this.pageSize, this.joinedFrom(), this.joinedTo(), this.loanState(), sortBy, sortDirection).pipe(finalize(() => this.loading.set(false))).subscribe({
       next: (response) => { this.members.set(response.content); this.totalMembers.set(response.totalElements); },
       error: (error) => this.error.set(apiErrorMessage(error)),
     });
@@ -59,6 +68,7 @@ export class MembersComponent {
   clearSearch(): void { this.searchTerm.set(''); this.search(); }
   applyFilters(): void { this.currentPage = 0; this.syncFilterUrl(); this.loadMembers(); }
   clearFilters(): void { this.joinedFrom.set(''); this.joinedTo.set(''); this.loanState.set(''); this.applyFilters(); }
+  changeSort(value: string): void { this.sortBy.set(value); this.currentPage = 0; void this.router.navigate([], { relativeTo: this.route, queryParamsHandling: 'merge', queryParams: { sort: value === 'lastName,asc' ? null : value } }); this.loadMembers(); }
   private syncFilterUrl(): void { void this.router.navigate([], { relativeTo: this.route, queryParamsHandling: 'merge', queryParams: { joinedFrom: this.joinedFrom() || null, joinedTo: this.joinedTo() || null, loanState: this.loanState() || null } }); }
   onPageChange(event: PageEvent): void { this.currentPage = event.pageIndex; this.pageSize = event.pageSize; this.loadMembers(); }
   initials(member: Member): string { return `${member.firstName.charAt(0)}${member.lastName.charAt(0)}`.toLocaleUpperCase('tr-TR'); }

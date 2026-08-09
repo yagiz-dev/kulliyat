@@ -16,11 +16,12 @@ import { BookDetailComponent } from '../book-detail/book-detail';
 import { BookFormComponent } from '../book-form/book-form';
 import { ExpandableSearchComponent } from '../expandable-search/expandable-search';
 import { FilterMenuComponent } from '../filter-menu/filter-menu';
+import { SortMenuComponent, SortOption } from '../sort-menu/sort-menu';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, BookDetailComponent, BookFormComponent, ExpandableSearchComponent, FilterMenuComponent, MatButtonModule, MatFormFieldModule, MatIcon, MatInputModule, MatPaginatorModule, MatSelectModule],
+  imports: [CommonModule, FormsModule, BookDetailComponent, BookFormComponent, ExpandableSearchComponent, FilterMenuComponent, SortMenuComponent, MatButtonModule, MatFormFieldModule, MatIcon, MatInputModule, MatPaginatorModule, MatSelectModule],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
@@ -34,7 +35,12 @@ export class DashboardComponent {
   readonly publishers = signal<Publisher[]>([]);
   readonly totalBooks = signal(0);
   readonly searchTerm = signal('');
-  readonly sortBy = signal('title');
+  readonly sortBy = signal('title,asc');
+  readonly sortOptions: SortOption[] = [
+    { value: 'title,asc', label: 'Kitap adı (A–Z)' }, { value: 'title,desc', label: 'Kitap adı (Z–A)' },
+    { value: 'publicationYear,desc', label: 'Yayın yılı (yeni–eski)' }, { value: 'publicationYear,asc', label: 'Yayın yılı (eski–yeni)' },
+    { value: 'createdAt,desc', label: 'Son eklenenler' },
+  ];
   readonly genreFilter = signal<Genre | ''>('');
   readonly authorFilter = signal<number | null>(null);
   readonly publisherFilter = signal<number | null>(null);
@@ -58,6 +64,7 @@ export class DashboardComponent {
 
   constructor() {
     const query = this.route.snapshot.queryParamMap;
+    this.sortBy.set(query.get('sort') || 'title,asc');
     this.genreFilter.set((query.get('genre') as Genre) || '');
     this.authorFilter.set(query.get('authorId') ? Number(query.get('authorId')) : null);
     this.publisherFilter.set(query.get('publisherId') ? Number(query.get('publisherId')) : null);
@@ -85,10 +92,11 @@ export class DashboardComponent {
   loadBooks(): void {
     this.loading.set(true);
     this.error.set('');
-    this.bookService.getBooks(this.searchTerm().trim(), this.currentPage, this.pageSize, this.sortBy(), {
+    const [sortBy, sortDirection] = this.sortBy().split(',');
+    this.bookService.getBooks(this.searchTerm().trim(), this.currentPage, this.pageSize, sortBy, {
       genre: this.genreFilter() || undefined, authorId: this.authorFilter() || undefined,
       publisherId: this.publisherFilter() || undefined, yearFrom: this.yearFrom() || undefined, yearTo: this.yearTo() || undefined,
-    })
+    }, sortDirection)
       .pipe(finalize(() => this.loading.set(false)))
       .subscribe({
         next: (response) => { this.books.set(response.content); this.totalBooks.set(response.totalElements); },
@@ -108,7 +116,7 @@ export class DashboardComponent {
   applyFilters(): void { this.currentPage = 0; this.syncFilterUrl(); this.loadBooks(); }
   clearFilters(): void { this.genreFilter.set(''); this.authorFilter.set(null); this.publisherFilter.set(null); this.yearFrom.set(null); this.yearTo.set(null); this.applyFilters(); }
   private syncFilterUrl(): void { void this.router.navigate([], { relativeTo: this.route, queryParamsHandling: 'merge', queryParams: { genre: this.genreFilter() || null, authorId: this.authorFilter(), publisherId: this.publisherFilter(), yearFrom: this.yearFrom(), yearTo: this.yearTo() } }); }
-  changeSort(value: string): void { this.sortBy.set(value); this.currentPage = 0; this.loadBooks(); }
+  changeSort(value: string): void { this.sortBy.set(value); this.currentPage = 0; void this.router.navigate([], { relativeTo: this.route, queryParamsHandling: 'merge', queryParams: { sort: value === 'title,asc' ? null : value } }); this.loadBooks(); }
 
   onPageChange(event: PageEvent): void {
     this.currentPage = event.pageIndex;

@@ -1,0 +1,7 @@
+:host { position: relative; width: 44px; display: block; flex: none; }
+.sort-toggle { width: 44px; height: 44px; border: 1px solid var(--border); border-radius: 50%; background: #fff; color: var(--brand-700); }
+.sort-toggle:hover { border-color: #caa5ae; background: var(--brand-100); }
+.sort-panel { position: absolute; z-index: 30; top: 52px; right: 0; width: 280px; overflow: hidden; border: 1px solid var(--border); border-radius: 14px; background: #fff; box-shadow: 0 18px 45px rgb(44 9 18 / 16%); }
+.sort-panel header { min-height: 54px; padding: 0 10px 0 18px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); }.sort-panel header strong { font-size: .9rem; }
+.sort-options { padding: 8px; display: grid; gap: 2px; }.sort-options > button { min-height: 42px; padding: 0 10px 0 12px; border: 0; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; background: transparent; color: var(--text); font: inherit; font-size: .82rem; text-align: left; cursor: pointer; }.sort-options > button:hover { background: var(--surface); }.sort-options > button.selected { background: var(--brand-100); color: var(--brand-700); font-weight: 650; }.sort-options mat-icon { width: 18px; height: 18px; font-size: 18px; }
+@media (max-width: 720px) { .sort-panel { position: fixed; top: auto; right: 0; bottom: 0; left: 0; width: auto; border-radius: 18px 18px 0 0; } }

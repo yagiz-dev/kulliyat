@@ -18,11 +18,12 @@ import { CopyDetailComponent } from '../copy-detail/copy-detail';
 import { CopyFormComponent } from '../copy-form/copy-form';
 import { ExpandableSearchComponent } from '../expandable-search/expandable-search';
 import { FilterMenuComponent } from '../filter-menu/filter-menu';
+import { SortMenuComponent, SortOption } from '../sort-menu/sort-menu';
 
 @Component({
   selector: 'app-inventory',
   standalone: true,
-  imports: [CommonModule, FormsModule, CopyDetailComponent, CopyFormComponent, ExpandableSearchComponent, FilterMenuComponent, MatButtonModule, MatFormFieldModule, MatIcon, MatInputModule, MatPaginatorModule, MatSelectModule],
+  imports: [CommonModule, FormsModule, CopyDetailComponent, CopyFormComponent, ExpandableSearchComponent, FilterMenuComponent, SortMenuComponent, MatButtonModule, MatFormFieldModule, MatIcon, MatInputModule, MatPaginatorModule, MatSelectModule],
   templateUrl: './inventory.html',
   styleUrl: './inventory.css',
 })
@@ -39,6 +40,12 @@ export class InventoryComponent {
   readonly locationFilter = signal('');
   readonly bookFilter = signal<number | null>(null);
   readonly books = signal<Book[]>([]);
+  readonly sortBy = signal('inventoryNumber,asc');
+  readonly sortOptions: SortOption[] = [
+    { value: 'inventoryNumber,asc', label: 'Envanter no. (artan)' }, { value: 'inventoryNumber,desc', label: 'Envanter no. (azalan)' },
+    { value: 'book.title,asc', label: 'Kitap adı (A–Z)' }, { value: 'status,asc', label: 'Duruma göre' },
+    { value: 'physicalLocation,asc', label: 'Konuma göre' },
+  ];
   readonly activeFilterCount = computed(() => [this.statusFilter(), this.locationFilter().trim(), this.bookFilter()].filter(Boolean).length);
   readonly loading = signal(true);
   readonly error = signal('');
@@ -62,6 +69,7 @@ export class InventoryComponent {
     this.statusFilter.set((query.get('status') as CopyStatus) || '');
     this.locationFilter.set(query.get('location') || '');
     this.bookFilter.set(query.get('bookId') ? Number(query.get('bookId')) : null);
+    this.sortBy.set(query.get('sort') || 'inventoryNumber,asc');
     afterNextRender(() => {
       this.loadCopies();
       this.bookService.getBooks('', 0, 500).subscribe((response) => this.books.set(response.content));
@@ -72,7 +80,8 @@ export class InventoryComponent {
   loadCopies(): void {
     this.loading.set(true);
     this.error.set('');
-    this.copyService.list(this.searchTerm().trim(), this.statusFilter() || undefined, this.currentPage, this.pageSize, this.locationFilter().trim(), this.bookFilter() || undefined)
+    const [sortBy, sortDirection] = this.sortBy().split(',');
+    this.copyService.list(this.searchTerm().trim(), this.statusFilter() || undefined, this.currentPage, this.pageSize, this.locationFilter().trim(), this.bookFilter() || undefined, sortBy, sortDirection)
       .pipe(finalize(() => this.loading.set(false)))
       .subscribe({
         next: (response) => { this.copies.set(response.content); this.totalCopies.set(response.totalElements); },
@@ -84,6 +93,7 @@ export class InventoryComponent {
   clearSearch(): void { this.searchTerm.set(''); this.search(); }
   applyFilters(): void { this.currentPage = 0; this.syncFilterUrl(); this.loadCopies(); }
   clearFilters(): void { this.statusFilter.set(''); this.locationFilter.set(''); this.bookFilter.set(null); this.applyFilters(); }
+  changeSort(value: string): void { this.sortBy.set(value); this.currentPage = 0; void this.router.navigate([], { relativeTo: this.route, queryParamsHandling: 'merge', queryParams: { sort: value === 'inventoryNumber,asc' ? null : value } }); this.loadCopies(); }
   private syncFilterUrl(): void { void this.router.navigate([], { relativeTo: this.route, queryParamsHandling: 'merge', queryParams: { status: this.statusFilter() || null, location: this.locationFilter().trim() || null, bookId: this.bookFilter() } }); }
   onPageChange(event: PageEvent): void { this.currentPage = event.pageIndex; this.pageSize = event.pageSize; this.loadCopies(); }
 
