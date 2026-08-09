@@ -29,8 +29,10 @@ public class BookCopyController {
             @RequestParam(required = false) String location,
             @RequestParam(required = false) Long bookId,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
-        return ResponseEntity.ok(PageResponse.from(bookCopyService.getCopies(search, status, location, bookId, page, size), BookCopyResponse::from));
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "inventoryNumber") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDirection) {
+        return ResponseEntity.ok(PageResponse.from(bookCopyService.getCopies(search, status, location, bookId, page, size, sortBy, sortDirection), BookCopyResponse::from));
     }
 
     @GetMapping("/copies/{id}")

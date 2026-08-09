@@ -36,8 +36,14 @@ public class BookCopyService {
         return bookCopyRepository.save(copy);
     }
 
-    public Page<BookCopy> getCopies(String search, CopyStatus status, String location, Long bookId, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("inventoryNumber"));
+    public Page<BookCopy> getCopies(String search, CopyStatus status, String location, Long bookId, int page, int size,
+                                    String sortBy, String sortDirection) {
+        String property = switch (sortBy) {
+            case "book.title", "status", "physicalLocation" -> sortBy;
+            default -> "inventoryNumber";
+        };
+        Sort.Direction direction = "desc".equalsIgnoreCase(sortDirection) ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, property));
         return bookCopyRepository.filter(normalize(search), status, normalize(location), bookId, pageable);
     }
 

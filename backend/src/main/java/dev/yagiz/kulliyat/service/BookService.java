@@ -43,8 +43,13 @@ public class BookService {
     }
 
     public Page<Book> getBooks(String search, Genre genre, Long authorId, Long publisherId,
-                               Integer yearFrom, Integer yearTo, int page, int size, String sortBy) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
+                               Integer yearFrom, Integer yearTo, int page, int size, String sortBy, String sortDirection) {
+        String property = switch (sortBy) {
+            case "publicationYear", "createdAt" -> sortBy;
+            default -> "title";
+        };
+        Sort.Direction direction = "desc".equalsIgnoreCase(sortDirection) ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, property));
         return bookRepository.filter(normalize(search), genre, authorId, publisherId, yearFrom, yearTo, pageable);
     }
 

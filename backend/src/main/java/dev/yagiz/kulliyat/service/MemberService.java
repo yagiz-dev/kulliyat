@@ -34,8 +34,13 @@ public class MemberService {
     }
 
     public Page<Member> getAllMembers(String search, LocalDate joinedFrom, LocalDate joinedTo, String loanState,
-                                      int page, int size, String sortBy) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy));
+                                      int page, int size, String sortBy, String sortDirection) {
+        String property = switch (sortBy) {
+            case "joinedAt", "id" -> sortBy;
+            default -> "lastName";
+        };
+        Sort.Direction direction = "desc".equalsIgnoreCase(sortDirection) ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, property));
         return memberRepository.filter(normalize(search), joinedFrom == null ? null : joinedFrom.atStartOfDay(),
                 joinedTo == null ? null : joinedTo.plusDays(1).atStartOfDay(), normalize(loanState), LocalDate.now(), pageable);
     }

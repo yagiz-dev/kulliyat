@@ -31,8 +31,9 @@ public class BookController {
             @RequestParam(required = false) Integer yearTo,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "title") String sortBy) {
-        return ResponseEntity.ok(PageResponse.from(bookService.getBooks(search, genre, authorId, publisherId, yearFrom, yearTo, page, size, sortBy), BookResponse::from));
+            @RequestParam(defaultValue = "title") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDirection) {
+        return ResponseEntity.ok(PageResponse.from(bookService.getBooks(search, genre, authorId, publisherId, yearFrom, yearTo, page, size, sortBy, sortDirection), BookResponse::from));
     }
 
     @GetMapping("/{id}")
