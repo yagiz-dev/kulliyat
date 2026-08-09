@@ -63,4 +63,22 @@ public class LoanService {
 
         return loanRepository.save(loan);
     }
+
+    @Transactional
+    public Loan returnBook(String inventoryNumber) {
+        // Find the active loan for this specific physical copy
+        Loan activeLoan = loanRepository.findByBookCopy_InventoryNumberAndReturnDateIsNull(inventoryNumber)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bu kitap şu anda ödünç alınmış gözükmüyor."));
+
+        // Mark the return date as today
+        activeLoan.setReturnDate(LocalDate.now());
+
+        // Update the physical copy's status back to AVAILABLE
+        BookCopy copy = activeLoan.getBookCopy();
+        copy.setStatus(CopyStatus.AVAILABLE);
+        bookCopyRepository.save(copy);
+
+        // Save and return the updated loan record
+        return loanRepository.save(activeLoan);
+    }
 }
