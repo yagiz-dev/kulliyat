@@ -15,11 +15,12 @@ import { BookCopy, CopyStatus } from '../../models/copy';
 import { CopyService } from '../../services/copy';
 import { CopyDetailComponent } from '../copy-detail/copy-detail';
 import { CopyFormComponent } from '../copy-form/copy-form';
+import { ExpandableSearchComponent } from '../expandable-search/expandable-search';
 
 @Component({
   selector: 'app-inventory',
   standalone: true,
-  imports: [CommonModule, FormsModule, CopyDetailComponent, CopyFormComponent, MatButtonModule, MatFormFieldModule, MatIcon, MatInputModule, MatPaginatorModule, MatSelectModule],
+  imports: [CommonModule, FormsModule, CopyDetailComponent, CopyFormComponent, ExpandableSearchComponent, MatButtonModule, MatFormFieldModule, MatIcon, MatInputModule, MatPaginatorModule, MatSelectModule],
   templateUrl: './inventory.html',
   styleUrl: './inventory.css',
 })

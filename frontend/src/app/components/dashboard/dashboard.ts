@@ -14,11 +14,12 @@ import { Author, Book, BookRequest, Genre, Publisher } from '../../models/book';
 import { BookService } from '../../services/book';
 import { BookDetailComponent } from '../book-detail/book-detail';
 import { BookFormComponent } from '../book-form/book-form';
+import { ExpandableSearchComponent } from '../expandable-search/expandable-search';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, BookDetailComponent, BookFormComponent, MatButtonModule, MatFormFieldModule, MatIcon, MatInputModule, MatPaginatorModule, MatSelectModule],
+  imports: [CommonModule, FormsModule, BookDetailComponent, BookFormComponent, ExpandableSearchComponent, MatButtonModule, MatFormFieldModule, MatIcon, MatInputModule, MatPaginatorModule, MatSelectModule],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })

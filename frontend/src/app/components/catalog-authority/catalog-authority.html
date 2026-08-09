@@ -1,16 +1,11 @@
 <div class="authority-page">
   <header class="page-header">
     <div><h1>{{ title }}</h1></div>
-    <button mat-flat-button type="button" (click)="startCreate()"><mat-icon>add</mat-icon>Yeni {{ singular }}</button>
+    <div class="header-actions"><app-expandable-search [query]="search()" [placeholder]="title + ' içinde ara'" (search)="search.set($event)" (clear)="search.set('')" /><button mat-flat-button type="button" (click)="startCreate()"><mat-icon>add</mat-icon>Yeni {{ singular }}</button></div>
   </header>
 
   <section class="workspace-card">
     <div class="toolbar">
-      <mat-form-field appearance="outline" subscriptSizing="dynamic">
-        <mat-label>{{ title }} içinde ara</mat-label>
-        <mat-icon matPrefix>search</mat-icon>
-        <input matInput [value]="search()" (input)="search.set($any($event.target).value)" />
-      </mat-form-field>
       <span>{{ filteredRecords().length }} kayıt</span>
     </div>
 

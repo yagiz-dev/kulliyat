@@ -12,8 +12,9 @@ import { Member } from '../../models/member';
 import { MemberService } from '../../services/member';
 import { MemberDetailComponent } from '../member-detail/member-detail';
 import { MemberFormComponent } from '../member-form/member-form';
+import { ExpandableSearchComponent } from '../expandable-search/expandable-search';
 
-@Component({ selector: 'app-members', standalone: true, imports: [FormsModule, MatButtonModule, MatFormFieldModule, MatIcon, MatInputModule, MatPaginatorModule, MemberDetailComponent, MemberFormComponent], templateUrl: './members.html', styleUrl: './members.css' })
+@Component({ selector: 'app-members', standalone: true, imports: [FormsModule, MatButtonModule, MatFormFieldModule, MatIcon, MatInputModule, MatPaginatorModule, ExpandableSearchComponent, MemberDetailComponent, MemberFormComponent], templateUrl: './members.html', styleUrl: './members.css' })
 export class MembersComponent {
   private readonly memberService = inject(MemberService);
   private readonly route = inject(ActivatedRoute);

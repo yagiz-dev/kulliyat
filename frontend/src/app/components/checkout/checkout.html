@@ -13,7 +13,7 @@
 
       <section class="workflow-card" [class.disabled]="!selectedMember()">
         <header><span>2</span><div><h2>Nüshayı okutun</h2><p>Kitabın üzerindeki envanter numarasını girin.</p></div></header>
-        <form class="inventory-entry" (ngSubmit)="lookupCopy()"><mat-form-field appearance="outline"><mat-label>Envanter numarası</mat-label><mat-icon matPrefix>qr_code_scanner</mat-icon><input matInput [disabled]="!selectedMember()" [value]="inventoryNumber()" (input)="inventoryNumber.set($any($event.target).value); selectedCopy.set(null)" placeholder="TOFAS-KTP-00001" /></mat-form-field><button mat-stroked-button type="submit" [disabled]="!selectedMember() || !inventoryNumber().trim() || checkingCopy()">Kontrol et</button></form>
+        <form class="inventory-entry" (ngSubmit)="lookupCopy()"><mat-form-field appearance="outline" subscriptSizing="dynamic"><mat-label>Envanter numarası</mat-label><mat-icon matPrefix>qr_code_scanner</mat-icon><input matInput [disabled]="!selectedMember()" [value]="inventoryNumber()" (input)="inventoryNumber.set($any($event.target).value); selectedCopy.set(null)" placeholder="TOFAS-KTP-00001" /></mat-form-field><button mat-flat-button type="submit" [disabled]="!selectedMember() || !inventoryNumber().trim() || checkingCopy()">Kontrol et</button></form>
         @if (selectedCopy(); as copy) { <div class="copy-result" [class.unavailable]="copy.status !== 'AVAILABLE'"><mat-icon>{{ copy.status === 'AVAILABLE' ? 'check_circle' : 'block' }}</mat-icon><div><strong>{{ copy.book.title }}</strong><span>{{ copy.inventoryNumber }} · {{ copy.physicalLocation || 'Konum belirtilmemiş' }}</span><small>{{ copy.status === 'AVAILABLE' ? 'Ödünç verilebilir' : 'Bu nüsha şu anda ödünç verilemez' }}</small></div></div> }
       </section>
 

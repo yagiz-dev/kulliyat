@@ -1,20 +1,10 @@
 <div class="catalog-page">
   <header class="catalog-header">
     <div><h1>Kitaplar</h1></div>
-    <button mat-flat-button type="button" (click)="openCreate()"><mat-icon>add</mat-icon>Yeni kitap</button>
+    <div class="header-actions"><app-expandable-search [query]="searchTerm()" placeholder="Kitap adına göre ara" (search)="searchTerm.set($event); search()" (clear)="clearSearch()" /><button mat-flat-button type="button" (click)="openCreate()"><mat-icon>add</mat-icon>Yeni kitap</button></div>
   </header>
 
   <section class="catalog-toolbar">
-    <form (ngSubmit)="search()" class="search-form">
-      <mat-form-field appearance="outline" subscriptSizing="dynamic">
-        <mat-label>Kitap adına göre ara</mat-label>
-        <mat-icon matPrefix>search</mat-icon>
-        <input matInput [value]="searchTerm()" (input)="searchTerm.set($any($event.target).value)" />
-        @if (searchTerm()) { <button mat-icon-button matSuffix type="button" aria-label="Aramayı temizle" (click)="clearSearch()"><mat-icon>close</mat-icon></button> }
-      </mat-form-field>
-      <button mat-stroked-button type="submit">Ara</button>
-    </form>
-
     <div class="toolbar-meta">
       <span>{{ totalBooks() }} kitap</span>
       <mat-form-field appearance="outline" subscriptSizing="dynamic">

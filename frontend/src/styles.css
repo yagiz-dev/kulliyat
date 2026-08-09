@@ -30,4 +30,18 @@ app-checkout .success-icon { width: 60px; height: 60px; margin: 0 auto 18px; bor
 app-checkout .success-card h2 { margin: 0 0 8px; font-size: 1.7rem; } app-checkout .success-card>p:not(.eyebrow) { color: var(--muted); }
 app-checkout .success-card dl { margin: 28px 0; display: grid; grid-template-columns: repeat(2,1fr); gap: 16px; text-align: left; } app-checkout .success-card dl div { padding: 12px; border-radius: 8px; background: var(--surface); }
 app-checkout .success-card dt { color: var(--muted); font-size: .65rem; text-transform: uppercase; } app-checkout .success-card dd { margin: 5px 0 0; font-size: .82rem; } app-checkout .success-card>div:last-child { display: flex; justify-content: center; gap: 8px; }
+
+app-checkout .search-row > button,
+app-checkout .inventory-entry > button,
+app-members .toolbar form > button,
+app-dashboard .search-form > button,
+app-inventory .toolbar form > button,
+app-copy-form .book-search > button,
+app-catalog-authority .record-form > button {
+  height: 56px;
+  padding: 0 24px;
+  border-radius: 8px;
+  flex: none;
+}
+
 @media (max-width: 760px) { app-checkout .success-card dl { grid-template-columns: 1fr; } }

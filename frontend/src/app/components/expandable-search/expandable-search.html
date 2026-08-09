@@ -1,0 +1,14 @@
+@if (!expanded()) {
+  <button mat-icon-button class="search-toggle" type="button" aria-label="Aramayı aç" [disabled]="disabled" (click)="open()">
+    <mat-icon>search</mat-icon>
+  </button>
+} @else {
+  <form class="search-form" (ngSubmit)="submit()" (keydown.escape)="close()">
+    <mat-form-field appearance="outline" subscriptSizing="dynamic">
+      <mat-label>{{ placeholder }}</mat-label>
+      <input #searchInput matInput [(ngModel)]="draft" name="search" autocomplete="off" />
+      <button mat-icon-button matSuffix type="button" aria-label="Aramayı temizle ve kapat" (click)="close()"><mat-icon>close</mat-icon></button>
+    </mat-form-field>
+    <button mat-flat-button type="submit" [disabled]="!draft.trim() || disabled">Ara</button>
+  </form>
+}

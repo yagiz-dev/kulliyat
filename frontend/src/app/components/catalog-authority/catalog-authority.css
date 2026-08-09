@@ -5,8 +5,9 @@
 h1 { margin: 0 0 8px; font-size: clamp(2rem, 4vw, 3.4rem); font-weight: 650; letter-spacing: -.04em; }
 .page-header p:last-child { margin: 0; color: var(--muted); }
 .page-header button mat-icon { margin-right: 6px; }
+.header-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
 .workspace-card { overflow: hidden; border: 1px solid var(--border); border-radius: 14px; background: #fff; }
-.toolbar { padding: 18px 20px; display: flex; align-items: center; justify-content: space-between; gap: 20px; border-bottom: 1px solid var(--border); }
+.toolbar { min-height: 50px; padding: 0 20px; display: flex; align-items: center; justify-content: flex-end; gap: 20px; border-bottom: 1px solid var(--border); }
 .toolbar mat-form-field { width: min(420px, 100%); }
 .toolbar > span { color: var(--muted); font-size: .8rem; }
 .record-form { padding: 16px 20px; display: flex; align-items: center; gap: 10px; background: var(--surface); border-bottom: 1px solid var(--border); }
@@ -22,4 +23,4 @@ h1 { margin: 0 0 8px; font-size: clamp(2rem, 4vw, 3.4rem); font-weight: 650; let
 .state { min-height: 220px; display: grid; place-content: center; justify-items: center; color: var(--muted); }
 .state mat-icon { width: 32px; height: 32px; font-size: 32px; }
 .error-message { margin: 14px 20px; color: #a5132d; font-size: .82rem; }
-@media (max-width: 640px) { .page-header { align-items: start; flex-direction: column; } .toolbar { align-items: start; flex-direction: column; } .record-form { align-items: stretch; flex-wrap: wrap; } .record-form mat-form-field { width: 100%; } }
+@media (max-width: 640px) { .page-header { align-items: stretch; flex-direction: column; } .header-actions { width: 100%; } .record-form { align-items: stretch; flex-wrap: wrap; } .record-form mat-form-field { width: 100%; } }

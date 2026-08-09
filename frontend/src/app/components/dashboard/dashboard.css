@@ -4,10 +4,10 @@
 .eyebrow { margin: 0 0 8px; color: var(--brand-700); font-size: .68rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
 h1 { margin: 0 0 8px; font-size: clamp(2.2rem, 4vw, 3.5rem); font-weight: 650; letter-spacing: -.04em; }
 .subtitle { margin: 0; color: var(--muted); }
-.catalog-header > button mat-icon { margin-right: 6px; }
-.catalog-toolbar { margin-bottom: 28px; padding: 14px; display: flex; align-items: center; justify-content: space-between; gap: 18px; border: 1px solid var(--border); border-radius: 12px; background: #fff; }
-.search-form, .toolbar-meta { display: flex; align-items: center; gap: 10px; }
-.search-form mat-form-field { width: min(390px, 48vw); }
+.catalog-header .header-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
+.catalog-header .header-actions > button mat-icon { margin-right: 6px; }
+.catalog-toolbar { margin-bottom: 28px; padding: 14px; display: flex; align-items: center; justify-content: flex-end; gap: 18px; border: 1px solid var(--border); border-radius: 12px; background: #fff; }
+.toolbar-meta { display: flex; align-items: center; gap: 10px; }
 .toolbar-meta > span { color: var(--muted); font-size: .8rem; white-space: nowrap; }
 .toolbar-meta mat-form-field { width: 170px; }
 .book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(205px, 1fr)); gap: 30px 22px; }
@@ -33,4 +33,4 @@ h1 { margin: 0 0 8px; font-size: clamp(2.2rem, 4vw, 3.5rem); font-weight: 650; l
 .error-banner { margin-bottom: 18px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; border-left: 3px solid #a5132d; background: #fff1f3; color: #7d1024; font-size: .82rem; }
 .error-banner button { margin-left: auto; }
 mat-paginator { margin-top: 34px; border-top: 1px solid var(--border); background: transparent; }
-@media (max-width: 720px) { .catalog-header, .catalog-toolbar { align-items: stretch; flex-direction: column; } .search-form, .toolbar-meta { align-items: stretch; } .search-form mat-form-field { width: 100%; } .toolbar-meta mat-form-field { width: 100%; } .book-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 14px; } .card-actions { align-items: start; flex-wrap: wrap; } }
+@media (max-width: 720px) { .catalog-header, .catalog-toolbar { align-items: stretch; flex-direction: column; } .catalog-header .header-actions { width: 100%; } .toolbar-meta { align-items: stretch; } .toolbar-meta mat-form-field { width: 100%; } .book-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 14px; } .card-actions { align-items: start; flex-wrap: wrap; } }

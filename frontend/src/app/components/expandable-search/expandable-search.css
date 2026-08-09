@@ -1,0 +1,8 @@
+:host { width: 44px; display: block; flex: none; transition: width 220ms ease; }
+:host(.expanded) { width: min(380px, 42vw); }
+.search-toggle { width: 44px; height: 44px; border: 1px solid var(--border); border-radius: 50%; background: #fff; color: var(--brand-700); }
+.search-toggle:hover { border-color: #caa5ae; background: var(--brand-100); }
+.search-form { width: 100%; display: flex; align-items: center; gap: 8px; }
+.search-form mat-form-field { min-width: 0; flex: 1; }
+.search-form > button { height: 56px; padding: 0 22px; border-radius: 8px; flex: none; }
+@media (max-width: 720px) { :host(.expanded) { width: 100%; order: 2; } .search-form { width: 100%; } }

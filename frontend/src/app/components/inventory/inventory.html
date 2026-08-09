@@ -1,7 +1,7 @@
 <div class="inventory-page">
   <header class="page-header">
     <div><h1>Nüshalar</h1></div>
-    <button mat-flat-button type="button" (click)="openCreate()"><mat-icon>add</mat-icon>Yeni nüsha</button>
+    <div class="header-actions"><app-expandable-search [query]="searchTerm()" placeholder="Envanter numarasına göre ara" (search)="searchTerm.set($event); search()" (clear)="clearSearch()" /><button mat-flat-button type="button" (click)="openCreate()"><mat-icon>add</mat-icon>Yeni nüsha</button></div>
   </header>
 
   @if (createdCopy(); as copy) {
@@ -10,10 +10,6 @@
 
   <section class="inventory-card">
     <div class="toolbar">
-      <form (ngSubmit)="search()">
-        <mat-form-field appearance="outline" subscriptSizing="dynamic"><mat-label>Envanter numarasına göre ara</mat-label><mat-icon matPrefix>search</mat-icon><input matInput [value]="searchTerm()" (input)="searchTerm.set($any($event.target).value)" />@if (searchTerm()) { <button mat-icon-button matSuffix type="button" aria-label="Aramayı temizle" (click)="clearSearch()"><mat-icon>close</mat-icon></button> }</mat-form-field>
-        <button mat-stroked-button type="submit">Ara</button>
-      </form>
       <div><span>{{ totalCopies() }} nüsha</span><mat-form-field appearance="outline" subscriptSizing="dynamic"><mat-label>Durum</mat-label><mat-select [value]="statusFilter()" (valueChange)="changeStatus($event)">@for (status of statuses; track status.value) { <mat-option [value]="status.value">{{ status.label }}</mat-option> }</mat-select></mat-form-field></div>
     </div>
 

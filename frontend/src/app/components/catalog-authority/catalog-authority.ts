@@ -10,6 +10,7 @@ import { finalize } from 'rxjs';
 import { apiErrorMessage } from '../../interceptors/api-error';
 import { Author, Publisher } from '../../models/book';
 import { BookService } from '../../services/book';
+import { ExpandableSearchComponent } from '../expandable-search/expandable-search';
 
 type AuthorityRecord = Author | Publisher;
 type AuthorityType = 'authors' | 'publishers';
@@ -17,7 +18,7 @@ type AuthorityType = 'authors' | 'publishers';
 @Component({
   selector: 'app-catalog-authority',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MatButtonModule, MatFormFieldModule, MatIcon, MatInputModule],
+  imports: [CommonModule, ReactiveFormsModule, ExpandableSearchComponent, MatButtonModule, MatFormFieldModule, MatIcon, MatInputModule],
   templateUrl: './catalog-authority.html',
   styleUrl: './catalog-authority.css',
 })
