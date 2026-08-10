@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
 import dev.yagiz.kulliyat.enums.Genre;
 
@@ -13,6 +14,11 @@ import dev.yagiz.kulliyat.enums.Genre;
 public interface BookRepository extends JpaRepository<Book, Long> {
 
     Page<Book> findByTitleContainingIgnoreCase(String title, Pageable pageable);
+
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    @Query("UPDATE Book b SET b.publisher = :target WHERE b.publisher = :source")
+    int reassignPublisher(@Param("source") dev.yagiz.kulliyat.entity.Publisher source,
+                          @Param("target") dev.yagiz.kulliyat.entity.Publisher target);
 
     @Query(value = "SELECT DISTINCT b FROM Book b LEFT JOIN b.authors a WHERE " +
             "(:search IS NULL OR LOWER(b.title) LIKE LOWER(CONCAT('%', :search, '%'))) AND " +

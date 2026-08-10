@@ -30,12 +30,18 @@ public final class ApiDtos {
         }
     }
 
-    public record AuthorResponse(Long id, String name) {
-        public static AuthorResponse from(Author author) { return new AuthorResponse(author.getId(), author.getName()); }
+    public record AuthorResponse(Long id, String name, long bookCount, long totalCopyCount, long availableCopyCount) {
+        public static AuthorResponse from(Author author) { return new AuthorResponse(author.getId(), author.getName(), 0, 0, 0); }
+        public static AuthorResponse summary(Long id, String name, long bookCount, long totalCopyCount, long availableCopyCount) {
+            return new AuthorResponse(id, name, bookCount, totalCopyCount, availableCopyCount);
+        }
     }
 
-    public record PublisherResponse(Long id, String name) {
-        public static PublisherResponse from(Publisher publisher) { return new PublisherResponse(publisher.getId(), publisher.getName()); }
+    public record PublisherResponse(Long id, String name, long bookCount, long totalCopyCount, long availableCopyCount) {
+        public static PublisherResponse from(Publisher publisher) { return new PublisherResponse(publisher.getId(), publisher.getName(), 0, 0, 0); }
+        public static PublisherResponse summary(Long id, String name, long bookCount, long totalCopyCount, long availableCopyCount) {
+            return new PublisherResponse(id, name, bookCount, totalCopyCount, availableCopyCount);
+        }
     }
 
     public record BookSummary(Long id, String title, String isbn, String coverImageUrl) {
