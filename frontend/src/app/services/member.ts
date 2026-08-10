@@ -9,7 +9,7 @@ import { Member, MemberRequest } from '../models/member';
 export class MemberService {
   private readonly http = inject(HttpClient);
   private readonly url = `${environment.apiUrl}/members`;
-  list(search = '', page = 0, size = 20, joinedFrom = '', joinedTo = '', loanState = '', sortBy = 'lastName', sortDirection = 'asc'): Observable<PageResponse<Member>> {
+  list(search = '', page = 0, size = 20, joinedFrom = '', joinedTo = '', loanState = '', sortBy = 'firstName', sortDirection = 'asc'): Observable<PageResponse<Member>> {
     let params = new HttpParams().set('page', page).set('size', size).set('sortBy', sortBy).set('sortDirection', sortDirection);
     if (search) params = params.set('search', search);
     if (joinedFrom) params = params.set('joinedFrom', joinedFrom);

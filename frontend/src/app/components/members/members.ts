@@ -29,11 +29,12 @@ export class MembersComponent {
   readonly joinedFrom = signal('');
   readonly joinedTo = signal('');
   readonly loanState = signal('');
-  readonly sortBy = signal('lastName,asc');
+  readonly sortBy = signal('firstName,asc');
   readonly sortOptions: SortOption[] = [
+    { value: 'firstName,asc', label: 'Ad (A–Z)' }, { value: 'firstName,desc', label: 'Ad (Z–A)' },
     { value: 'lastName,asc', label: 'Soyadı (A–Z)' }, { value: 'lastName,desc', label: 'Soyadı (Z–A)' },
     { value: 'joinedAt,desc', label: 'En yeni kayıtlar' }, { value: 'joinedAt,asc', label: 'En eski kayıtlar' },
-    { value: 'id,desc', label: 'Üye no. (azalan)' },
+    { value: 'id,asc', label: 'Üye no. (artan)' }, { value: 'id,desc', label: 'Üye no. (azalan)' },
   ];
   readonly activeFilterCount = computed(() => [this.joinedFrom(), this.joinedTo(), this.loanState()].filter(Boolean).length);
   readonly loading = signal(true);
@@ -50,7 +51,7 @@ export class MembersComponent {
     this.joinedFrom.set(query.get('joinedFrom') || '');
     this.joinedTo.set(query.get('joinedTo') || '');
     this.loanState.set(query.get('loanState') || '');
-    this.sortBy.set(query.get('sort') || 'lastName,asc');
+    this.sortBy.set(query.get('sort') || 'firstName,asc');
     afterNextRender(() => {
       this.loadMembers();
       if (this.route.snapshot.queryParamMap.get('create') === 'true') this.openCreate();
@@ -69,7 +70,7 @@ export class MembersComponent {
   clearSearch(): void { this.searchTerm.set(''); this.search(); }
   applyFilters(): void { this.currentPage = 0; this.syncFilterUrl(); this.loadMembers(); }
   clearFilters(): void { this.joinedFrom.set(''); this.joinedTo.set(''); this.loanState.set(''); this.applyFilters(); }
-  changeSort(value: string): void { this.sortBy.set(value); this.currentPage = 0; void this.router.navigate([], { relativeTo: this.route, queryParamsHandling: 'merge', queryParams: { sort: value === 'lastName,asc' ? null : value } }); this.loadMembers(); }
+  changeSort(value: string): void { this.sortBy.set(value); this.currentPage = 0; void this.router.navigate([], { relativeTo: this.route, queryParamsHandling: 'merge', queryParams: { sort: value === 'firstName,asc' ? null : value } }); this.loadMembers(); }
   private syncFilterUrl(): void { void this.router.navigate([], { relativeTo: this.route, queryParamsHandling: 'merge', queryParams: { joinedFrom: this.joinedFrom() || null, joinedTo: this.joinedTo() || null, loanState: this.loanState() || null } }); }
   onPageChange(event: PageEvent): void { this.currentPage = event.pageIndex; this.pageSize = event.pageSize; this.loadMembers(); }
   memberState(member: Member): string { return member.overdueLoanCount ? 'Gecikmesi var' : member.activeLoanCount ? 'Ödünçte kitabı var' : 'Uygun'; }
