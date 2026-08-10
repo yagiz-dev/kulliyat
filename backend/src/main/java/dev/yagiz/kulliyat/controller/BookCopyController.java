@@ -27,7 +27,7 @@ public class BookCopyController {
 
     @PostMapping("/books/{bookId}/copies")
     public ResponseEntity<BookCopyResponse> addCopy(@PathVariable Long bookId, @Valid @RequestBody AddCopyRequest request) {
-        return ResponseEntity.ok(BookCopyResponse.from(bookCopyService.addCopyToBook(bookId, request.physicalLocation(), request.notes())));
+        return ResponseEntity.ok(BookCopyResponse.from(bookCopyService.addCopyToBook(bookId, request.physicalLocation(), request.notes(), request.status())));
     }
 
     @GetMapping("/copies")

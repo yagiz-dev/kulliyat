@@ -24,7 +24,7 @@ public class BookCopyService {
         this.bookRepository = bookRepository;
     }
 
-    public BookCopy addCopyToBook(Long bookId, String physicalLocation, String notes) {
+    public BookCopy addCopyToBook(Long bookId, String physicalLocation, String notes, CopyStatus status) {
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Book not found"));
         Long nextId = bookCopyRepository.findMaxId() + 1;
@@ -32,7 +32,10 @@ public class BookCopyService {
         copy.setInventoryNumber(String.format("TOFAS-KTP-%05d", nextId));
         copy.setPhysicalLocation(physicalLocation);
         copy.setNotes(normalizeNotes(notes));
-        copy.setStatus(CopyStatus.AVAILABLE);
+        if (status == CopyStatus.LOANED) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Yeni bir nüsha doğrudan ödünçte olarak oluşturulamaz.");
+        }
+        copy.setStatus(status == null ? CopyStatus.AVAILABLE : status);
         copy.setBook(book);
         return bookCopyRepository.save(copy);
     }
