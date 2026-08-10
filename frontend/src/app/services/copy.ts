@@ -5,6 +5,11 @@ import { environment } from '../../environments/environment';
 import { PageResponse } from '../models/api';
 import { BookCopy, CopyStatus, UpdateCopyRequest } from '../models/copy';
 
+export interface CopyLabelRequest {
+  copyIds: number[];
+  startPosition: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class CopyService {
   private readonly http = inject(HttpClient);
@@ -22,5 +27,8 @@ export class CopyService {
   }
   update(id: number, request: UpdateCopyRequest): Observable<BookCopy> {
     return this.http.patch<BookCopy>(`${environment.apiUrl}/copies/${id}`, request);
+  }
+  generateLabels(request: CopyLabelRequest): Observable<Blob> {
+    return this.http.post(`${environment.apiUrl}/copies/labels`, request, { responseType: 'blob' });
   }
 }

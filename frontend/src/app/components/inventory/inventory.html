@@ -1,16 +1,16 @@
 <div class="inventory-page">
   <header class="page-header">
     <div><h1>Nüshalar</h1></div>
-    <div class="header-actions"><app-expandable-search [query]="searchTerm()" placeholder="Envanter numarasına göre ara" (search)="searchTerm.set($event); search()" (clear)="clearSearch()" /><app-filter-menu [activeCount]="activeFilterCount()" (apply)="applyFilters()" (clear)="clearFilters()"><div class="copy-filters"><mat-form-field appearance="outline" subscriptSizing="dynamic"><mat-label>Durum</mat-label><mat-select [value]="statusFilter()" (valueChange)="statusFilter.set($event)">@for (status of statuses; track status.value) { <mat-option [value]="status.value">{{ status.label }}</mat-option> }</mat-select></mat-form-field><mat-form-field appearance="outline" subscriptSizing="dynamic"><mat-label>Kitap</mat-label><mat-select [value]="bookFilter()" (valueChange)="bookFilter.set($event)"><mat-option [value]="null">Tüm kitaplar</mat-option>@for (book of books(); track book.id) { <mat-option [value]="book.id">{{ book.title }}</mat-option> }</mat-select></mat-form-field><mat-form-field appearance="outline" subscriptSizing="dynamic"><mat-label>Fiziksel konum</mat-label><input matInput [value]="locationFilter()" (input)="locationFilter.set($any($event.target).value)" placeholder="Örn. 2. kat" /></mat-form-field></div></app-filter-menu><app-sort-menu [options]="sortOptions" [value]="sortBy()" (valueChange)="changeSort($event)" /><button mat-flat-button type="button" (click)="openCreate()"><mat-icon>add</mat-icon>Yeni nüsha</button></div>
+    <div class="header-actions"><app-expandable-search [query]="searchTerm()" placeholder="Envanter numarasına göre ara" (search)="searchTerm.set($event); search()" (clear)="clearSearch()" /><app-filter-menu [activeCount]="activeFilterCount()" (apply)="applyFilters()" (clear)="clearFilters()"><div class="copy-filters"><mat-form-field appearance="outline" subscriptSizing="dynamic"><mat-label>Durum</mat-label><mat-select [value]="statusFilter()" (valueChange)="statusFilter.set($event)">@for (status of statuses; track status.value) { <mat-option [value]="status.value">{{ status.label }}</mat-option> }</mat-select></mat-form-field><mat-form-field appearance="outline" subscriptSizing="dynamic"><mat-label>Kitap</mat-label><mat-select [value]="bookFilter()" (valueChange)="bookFilter.set($event)"><mat-option [value]="null">Tüm kitaplar</mat-option>@for (book of books(); track book.id) { <mat-option [value]="book.id">{{ book.title }}</mat-option> }</mat-select></mat-form-field><mat-form-field appearance="outline" subscriptSizing="dynamic"><mat-label>Fiziksel konum</mat-label><input matInput [value]="locationFilter()" (input)="locationFilter.set($any($event.target).value)" placeholder="Örn. 2. kat" /></mat-form-field></div></app-filter-menu><app-sort-menu [options]="sortOptions" [value]="sortBy()" (valueChange)="changeSort($event)" /><button mat-stroked-button type="button" [disabled]="!selectedCopyIds().size" (click)="openSelectedLabels()"><mat-icon>qr_code_2</mat-icon>Etiket oluştur@if (selectedCopyIds().size) { <span>&nbsp;({{ selectedCopyIds().size }})</span> }</button><button mat-flat-button type="button" (click)="openCreate()"><mat-icon>add</mat-icon>Yeni nüsha</button></div>
   </header>
 
   @if (createdCopy(); as copy) {
-    <div class="success-banner"><mat-icon>check_circle</mat-icon><div><strong>Nüsha oluşturuldu</strong><span>Yeni envanter numarası: {{ copy.inventoryNumber }}</span></div><button mat-icon-button type="button" aria-label="Kapat" (click)="createdCopy.set(null)"><mat-icon>close</mat-icon></button></div>
+    <div class="success-banner"><mat-icon>check_circle</mat-icon><div><strong>Nüsha oluşturuldu</strong><span>Yeni envanter numarası: {{ copy.inventoryNumber }}</span></div><button mat-button type="button" (click)="openLabels([copy.id])"><mat-icon>qr_code_2</mat-icon>Etiketi yazdır</button><button mat-icon-button type="button" aria-label="Kapat" (click)="createdCopy.set(null)"><mat-icon>close</mat-icon></button></div>
   }
 
   <section class="inventory-card">
     <div class="toolbar">
-      <div><span>{{ totalCopies() }} nüsha</span></div>
+      <div><span>{{ totalCopies() }} nüsha</span>@if (selectedCopyIds().size) { <span class="selection-count">{{ selectedCopyIds().size }} seçili</span><button mat-button type="button" (click)="clearSelection()">Seçimi temizle</button> }</div>
     </div>
 
     @if (error()) { <div class="error-banner"><mat-icon>error_outline</mat-icon><span>{{ error() }}</span><button mat-button type="button" (click)="loadCopies()">Tekrar dene</button></div> }
@@ -18,9 +18,10 @@
     @else if (!copies().length) { <div class="state"><mat-icon>inventory_2</mat-icon><h2>{{ searchTerm() || activeFilterCount() ? 'Eşleşen nüsha bulunamadı' : 'Henüz fiziksel nüsha eklenmemiş' }}</h2><p>{{ searchTerm() || activeFilterCount() ? 'Arama veya filtre seçimlerinizi değiştirerek tekrar deneyin.' : 'Yeni bir nüsha ekleyerek fiziksel envanteri oluşturmaya başlayın.' }}</p></div> }
     @else {
       <div class="copy-table" role="table" aria-label="Fiziksel nüshalar">
-        <div class="table-head" role="row"><span>Envanter no.</span><span>Kitap</span><span>Konum</span><span>Durum</span><span></span></div>
+        <div class="table-head" role="row"><mat-checkbox [checked]="allPageSelected()" [indeterminate]="somePageSelected()" aria-label="Sayfadaki nüshaları seç" (change)="togglePage($event.checked)" /><span>Envanter no.</span><span>Kitap</span><span>Konum</span><span>Durum</span><span></span></div>
         @for (copy of copies(); track copy.id) {
           <article role="row" (click)="selectedCopy.set(copy)">
+            <mat-checkbox [checked]="isSelected(copy)" [attr.aria-label]="copy.inventoryNumber + ' nüshasını seç'" (click)="$event.stopPropagation()" (change)="toggleCopy(copy, $event.checked)" />
             <strong class="inventory-number">{{ copy.inventoryNumber }}</strong>
             <div class="book-cell"><span class="cover">@if (coverUrl(copy.book); as cover) { <img [src]="cover" alt="" /> } @else { {{ copy.book.title.charAt(0) }} }</span><span><strong>{{ copy.book.title }}</strong><small>ISBN {{ copy.book.isbn }}</small></span></div>
             <span class="location"><mat-icon>location_on</mat-icon>{{ copy.physicalLocation || 'Konum belirtilmemiş' }}</span>
@@ -38,5 +39,7 @@
 @if (formOpen()) { <app-copy-form [copy]="editingCopy()" [initialBookId]="bookFilter()" (saved)="copySaved($event)" (cancel)="closeForm()" /> }
 
 @if (selectedCopy(); as copy) {
-  <app-copy-detail [copy]="copy" (close)="selectedCopy.set(null)" (edit)="openEdit($event)" />
+  <app-copy-detail [copy]="copy" (close)="selectedCopy.set(null)" (edit)="openEdit($event)" (printLabel)="selectedCopy.set(null); openLabels([$event.id])" />
 }
+
+@if (labelDialogOpen()) { <app-label-print-dialog [copyIds]="labelCopyIds()" (close)="closeLabels()" /> }

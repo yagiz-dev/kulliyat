@@ -48,6 +48,7 @@
 
 .account-area {
   position: relative;
+  z-index: 1;
 }
 
 .account-trigger {
@@ -115,6 +116,7 @@
 
 .account-menu {
   position: absolute;
+  z-index: 1;
   top: calc(100% + 8px);
   right: 0;
   width: 232px;

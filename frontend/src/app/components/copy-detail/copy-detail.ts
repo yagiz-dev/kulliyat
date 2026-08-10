@@ -10,6 +10,7 @@ export class CopyDetailComponent {
   @Input({ required: true }) copy!: BookCopy;
   @Output() close = new EventEmitter<void>();
   @Output() edit = new EventEmitter<BookCopy>();
+  @Output() printLabel = new EventEmitter<BookCopy>();
   statusLabel(status: CopyStatus): string { return ({ AVAILABLE: 'Ödünç verilebilir', LOANED: 'Ödünçte', MAINTENANCE: 'Bakımda', LOST: 'Kayıp' })[status]; }
   coverUrl(book: BookSummary): string | null {
     const value = book.coverImageUrl?.trim();

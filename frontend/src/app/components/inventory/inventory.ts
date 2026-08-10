@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, afterNextRender, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -19,11 +20,12 @@ import { CopyFormComponent } from '../copy-form/copy-form';
 import { ExpandableSearchComponent } from '../expandable-search/expandable-search';
 import { FilterMenuComponent } from '../filter-menu/filter-menu';
 import { SortMenuComponent, SortOption } from '../sort-menu/sort-menu';
+import { LabelPrintDialogComponent } from '../label-print-dialog/label-print-dialog';
 
 @Component({
   selector: 'app-inventory',
   standalone: true,
-  imports: [CommonModule, FormsModule, CopyDetailComponent, CopyFormComponent, ExpandableSearchComponent, FilterMenuComponent, SortMenuComponent, MatButtonModule, MatFormFieldModule, MatIcon, MatInputModule, MatPaginatorModule, MatSelectModule],
+  imports: [CommonModule, FormsModule, CopyDetailComponent, CopyFormComponent, LabelPrintDialogComponent, ExpandableSearchComponent, FilterMenuComponent, SortMenuComponent, MatButtonModule, MatCheckboxModule, MatFormFieldModule, MatIcon, MatInputModule, MatPaginatorModule, MatSelectModule],
   templateUrl: './inventory.html',
   styleUrl: './inventory.css',
 })
@@ -53,6 +55,9 @@ export class InventoryComponent {
   readonly editingCopy = signal<BookCopy | null>(null);
   readonly formOpen = signal(false);
   readonly createdCopy = signal<BookCopy | null>(null);
+  readonly selectedCopyIds = signal<Set<number>>(new Set());
+  readonly labelCopyIds = signal<number[]>([]);
+  readonly labelDialogOpen = signal(false);
   pageSize = 20;
   currentPage = 0;
 
@@ -96,6 +101,28 @@ export class InventoryComponent {
   changeSort(value: string): void { this.sortBy.set(value); this.currentPage = 0; void this.router.navigate([], { relativeTo: this.route, queryParamsHandling: 'merge', queryParams: { sort: value === 'inventoryNumber,asc' ? null : value } }); this.loadCopies(); }
   private syncFilterUrl(): void { void this.router.navigate([], { relativeTo: this.route, queryParamsHandling: 'merge', queryParams: { status: this.statusFilter() || null, location: this.locationFilter().trim() || null, bookId: this.bookFilter() } }); }
   onPageChange(event: PageEvent): void { this.currentPage = event.pageIndex; this.pageSize = event.pageSize; this.loadCopies(); }
+
+  isSelected(copy: BookCopy): boolean { return this.selectedCopyIds().has(copy.id); }
+  allPageSelected(): boolean { return this.copies().length > 0 && this.copies().every((copy) => this.isSelected(copy)); }
+  somePageSelected(): boolean { return this.copies().some((copy) => this.isSelected(copy)) && !this.allPageSelected(); }
+  toggleCopy(copy: BookCopy, selected: boolean): void {
+    const ids = new Set(this.selectedCopyIds());
+    selected ? ids.add(copy.id) : ids.delete(copy.id);
+    this.selectedCopyIds.set(ids);
+  }
+  togglePage(selected: boolean): void {
+    const ids = new Set(this.selectedCopyIds());
+    this.copies().forEach((copy) => selected ? ids.add(copy.id) : ids.delete(copy.id));
+    this.selectedCopyIds.set(ids);
+  }
+  clearSelection(): void { this.selectedCopyIds.set(new Set()); }
+  openSelectedLabels(): void { this.openLabels([...this.selectedCopyIds()]); }
+  openLabels(ids: number[]): void {
+    if (!ids.length) return;
+    this.labelCopyIds.set(ids);
+    this.labelDialogOpen.set(true);
+  }
+  closeLabels(): void { this.labelDialogOpen.set(false); }
 
   statusLabel(status: CopyStatus): string {
     return ({ AVAILABLE: 'Ödünç verilebilir', LOANED: 'Ödünçte', MAINTENANCE: 'Bakımda', LOST: 'Kayıp' })[status];
