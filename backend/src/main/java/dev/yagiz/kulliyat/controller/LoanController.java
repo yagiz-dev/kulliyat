@@ -10,6 +10,8 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+
 @RestController
 @RequestMapping("/api/loans")
 public class LoanController {
@@ -21,9 +23,21 @@ public class LoanController {
     public ResponseEntity<PageResponse<LoanResponse>> getLoans(
             @RequestParam(defaultValue = "ALL") LoanStatus status,
             @RequestParam(required = false) Long memberId,
+            @RequestParam(required = false) Long bookId,
+            @RequestParam(required = false) Long copyId,
+            @RequestParam(defaultValue = "") String search,
+            @RequestParam(required = false) LocalDate checkoutFrom,
+            @RequestParam(required = false) LocalDate checkoutTo,
+            @RequestParam(required = false) LocalDate dueFrom,
+            @RequestParam(required = false) LocalDate dueTo,
+            @RequestParam(defaultValue = "") String issuedBy,
+            @RequestParam(defaultValue = "") String overdueRange,
+            @RequestParam(defaultValue = "checkoutDate") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDirection,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
-        return ResponseEntity.ok(PageResponse.from(loanService.getLoans(status, memberId, page, size), LoanResponse::from));
+        return ResponseEntity.ok(PageResponse.from(loanService.getLoans(status, memberId, bookId, copyId, search, checkoutFrom,
+                checkoutTo, dueFrom, dueTo, issuedBy, overdueRange, sortBy, sortDirection, page, size), LoanResponse::from));
     }
 
     @PostMapping("/checkout")

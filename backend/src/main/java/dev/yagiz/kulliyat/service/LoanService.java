@@ -19,6 +19,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
+import java.util.Map;
+
 @Service
 public class LoanService {
     public enum LoanStatus { ALL, ACTIVE, OVERDUE }
@@ -87,19 +89,34 @@ public class LoanService {
         return loanRepository.save(activeLoan);
     }
 
-    public Page<Loan> getLoans(LoanStatus status, Long memberId, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "checkoutDate"));
-        if (memberId != null) {
-            return switch (status == null ? LoanStatus.ALL : status) {
-                case ACTIVE -> loanRepository.findByMember_IdAndReturnDateIsNull(memberId, pageable);
-                case OVERDUE -> loanRepository.findByMember_IdAndReturnDateIsNullAndDueDateBefore(memberId, LocalDate.now(), pageable);
-                case ALL -> loanRepository.findByMember_Id(memberId, pageable);
-            };
-        }
-        return switch (status == null ? LoanStatus.ALL : status) {
-            case ACTIVE -> loanRepository.findByReturnDateIsNull(pageable);
-            case OVERDUE -> loanRepository.findByReturnDateIsNullAndDueDateBefore(LocalDate.now(), pageable);
-            case ALL -> loanRepository.findAll(pageable);
+    public Page<Loan> getLoans(LoanStatus status, Long memberId, Long bookId, Long copyId, String search, LocalDate checkoutFrom,
+                               LocalDate checkoutTo, LocalDate dueFrom, LocalDate dueTo, String issuedBy,
+                               String overdueRange, String sortBy, String sortDirection, int page, int size) {
+        Map<String, String> allowedSorts = Map.of(
+                "checkoutDate", "checkoutDate", "dueDate", "dueDate",
+                "bookCopy.book.title", "bookCopy.book.title", "member.lastName", "member.lastName");
+        String safeSort = allowedSorts.getOrDefault(sortBy, "checkoutDate");
+        Sort.Direction direction = "asc".equalsIgnoreCase(sortDirection) ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, safeSort));
+        LocalDate today = LocalDate.now();
+        LocalDate overdueFrom = switch (overdueRange == null ? "" : overdueRange) {
+            case "1_7" -> today.minusDays(7);
+            case "8_30" -> today.minusDays(30);
+            default -> null;
         };
+        LocalDate overdueTo = switch (overdueRange == null ? "" : overdueRange) {
+            case "1_7" -> today.minusDays(1);
+            case "8_30" -> today.minusDays(8);
+            case "30_PLUS" -> today.minusDays(31);
+            default -> null;
+        };
+        return loanRepository.search(
+                (status == null ? LoanStatus.ALL : status).name(), memberId, bookId, copyId, normalize(search),
+                checkoutFrom, checkoutTo, dueFrom, dueTo, normalize(issuedBy),
+                overdueRange == null ? "" : overdueRange, overdueFrom, overdueTo, today, pageable);
+    }
+
+    private String normalize(String value) {
+        return value == null ? "" : value.trim().toLowerCase();
     }
 }
