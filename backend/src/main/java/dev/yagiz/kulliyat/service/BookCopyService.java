@@ -26,7 +26,7 @@ public class BookCopyService {
 
     public BookCopy addCopyToBook(Long bookId, String physicalLocation, String notes, CopyStatus status) {
         Book book = bookRepository.findById(bookId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Book not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Kitap bulunamadı"));
         Long nextId = bookCopyRepository.findMaxId() + 1;
         BookCopy copy = new BookCopy();
         copy.setInventoryNumber(String.format("TOFAS-KTP-%05d", nextId));

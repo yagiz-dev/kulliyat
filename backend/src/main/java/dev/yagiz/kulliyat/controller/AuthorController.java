@@ -71,7 +71,7 @@ public class AuthorController {
         return ResponseEntity.noContent().build();
     }
 
-    private Author find(Long id) { return repository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Author not found")); }
+    private Author find(Long id) { return repository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Yazar bulunamadı")); }
     private String normalize(String value) { return value.trim().replaceAll("\\s+", " "); }
     private AuthorResponse summary(Object[] row) { return AuthorResponse.summary((Long) row[0], (String) row[1], ((Number) row[2]).longValue(), ((Number) row[3]).longValue(), ((Number) row[4]).longValue()); }
 }

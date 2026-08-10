@@ -66,7 +66,7 @@ public class PublisherController {
         return ResponseEntity.noContent().build();
     }
 
-    private Publisher find(Long id) { return repository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Publisher not found")); }
+    private Publisher find(Long id) { return repository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Yayınevi bulunamadı")); }
     private String normalize(String value) { return value.trim().replaceAll("\\s+", " "); }
     private PublisherResponse summary(Object[] row) { return PublisherResponse.summary((Long) row[0], (String) row[1], ((Number) row[2]).longValue(), ((Number) row[3]).longValue(), ((Number) row[4]).longValue()); }
 }

@@ -37,14 +37,14 @@ public class MemberService {
 
     public Member getMember(Long id) {
         return memberRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Member not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Üye kaydı bulunamadı"));
     }
 
     public Page<MemberResponse> getAllMembers(String search, LocalDate joinedFrom, LocalDate joinedTo, String loanState,
                                               int page, int size, String sortBy, String sortDirection) {
         String property = switch (sortBy) {
-            case "joinedAt", "id" -> sortBy;
-            default -> "lastName";
+            case "firstName", "lastName", "joinedAt", "id" -> sortBy;
+            default -> "firstName";
         };
         Sort.Direction direction = "desc".equalsIgnoreCase(sortDirection) ? Sort.Direction.DESC : Sort.Direction.ASC;
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, property));

@@ -29,7 +29,7 @@ public class MemberController {
             @RequestParam(required = false) String loanState,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "lastName") String sortBy,
+            @RequestParam(defaultValue = "firstName") String sortBy,
             @RequestParam(defaultValue = "asc") String sortDirection) {
         return ResponseEntity.ok(PageResponse.from(memberService.getAllMembers(search, joinedFrom, joinedTo, loanState, page, size, sortBy, sortDirection), response -> response));
     }

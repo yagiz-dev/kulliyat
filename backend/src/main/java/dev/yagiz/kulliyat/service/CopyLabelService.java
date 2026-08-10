@@ -103,12 +103,12 @@ public class CopyLabelService {
         content.addRect(x, y, LABEL_SIZE, LABEL_SIZE);
         content.stroke();
 
-        float qrSize = 31.5f * POINTS_PER_MM;
+        float qrSize = 33f * POINTS_PER_MM;
         float qrX = x + (LABEL_SIZE - qrSize) / 2;
-        float qrY = y + 5.25f * POINTS_PER_MM;
+        float qrY = y + 3.5f * POINTS_PER_MM;
         drawQr(content, copy.getInventoryNumber(), qrX, qrY, qrSize);
 
-        drawCenteredText(content, semibold, 8.5f, BRAND, x, y + LABEL_SIZE - 4.8f * POINTS_PER_MM,
+        drawCenteredText(content, semibold, 10f, BRAND, x, y + LABEL_SIZE - 5.5f * POINTS_PER_MM,
                 LABEL_SIZE, "KÜLLİYAT");
         drawCenteredText(content, semibold, 6.8f, Color.BLACK, x, y + 3.3f * POINTS_PER_MM,
                 LABEL_SIZE, copy.getInventoryNumber());

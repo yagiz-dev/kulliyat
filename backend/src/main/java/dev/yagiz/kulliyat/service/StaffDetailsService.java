@@ -24,7 +24,7 @@ public class StaffDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(@NonNull String username) throws UsernameNotFoundException {
         Staff staff = staffRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Staff not found"));
+                .orElseThrow(() -> new UsernameNotFoundException("Yönetici hesabı bulunamadı"));
 
         // Converts our Staff entity into a Spring Security User object
         return new User(
