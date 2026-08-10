@@ -39,6 +39,7 @@ export class CopyFormComponent implements OnChanges {
   readonly error = signal('');
   readonly form = this.fb.group({
     physicalLocation: this.fb.nonNullable.control('', Validators.maxLength(255)),
+    notes: this.fb.nonNullable.control('', Validators.maxLength(2000)),
     status: this.fb.nonNullable.control<CopyStatus>('AVAILABLE'),
   });
   readonly statuses: { value: CopyStatus; label: string }[] = [
@@ -49,7 +50,7 @@ export class CopyFormComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['copy']) {
-      this.form.reset({ physicalLocation: this.copy?.physicalLocation ?? '', status: this.copy?.status ?? 'AVAILABLE' });
+      this.form.reset({ physicalLocation: this.copy?.physicalLocation ?? '', notes: this.copy?.notes ?? '', status: this.copy?.status ?? 'AVAILABLE' });
       this.selectedBook.set(null);
       this.error.set('');
     }
@@ -85,9 +86,10 @@ export class CopyFormComponent implements OnChanges {
     if (this.submitting()) return;
     if (!this.copy && !this.selectedBook()) { this.error.set('Nüshanın ekleneceği kitabı seçin.'); return; }
     const location = this.form.controls.physicalLocation.value.trim();
+    const notes = this.form.controls.notes.value.trim();
     const request = this.copy
-      ? this.copyService.update(this.copy.id, { physicalLocation: location, status: this.copy.status === 'LOANED' ? undefined : this.form.controls.status.value })
-      : this.copyService.add(this.selectedBook()!.id, location);
+      ? this.copyService.update(this.copy.id, { physicalLocation: location, notes, status: this.copy.status === 'LOANED' ? undefined : this.form.controls.status.value })
+      : this.copyService.add(this.selectedBook()!.id, location, notes);
     this.submitting.set(true);
     this.error.set('');
     request.pipe(finalize(() => this.submitting.set(false))).subscribe({

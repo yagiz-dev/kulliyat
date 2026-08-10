@@ -34,6 +34,8 @@
           <mat-form-field appearance="outline"><mat-label>Durum</mat-label><mat-select formControlName="status" [disabled]="copy.status === 'LOANED'">@for (status of statuses; track status.value) { <mat-option [value]="status.value">{{ status.label }}</mat-option> }</mat-select></mat-form-field>
           @if (copy.status === 'LOANED') { <p class="loan-note"><mat-icon>info</mat-icon>Ödünçteki nüshanın durumu yalnızca iade işlemiyle değiştirilebilir.</p> }
         }
+        <mat-form-field class="notes-field" appearance="outline" [class.attention]="form.controls.status.value === 'MAINTENANCE' || form.controls.status.value === 'LOST'"><mat-label>Nüsha notları</mat-label><textarea matInput formControlName="notes" rows="4" maxlength="2000" placeholder="Bakım, hasar, kayıp veya yerleşimle ilgili açıklamalar"></textarea><mat-hint align="end">{{ form.controls.notes.value.length }}/2000</mat-hint>@if (form.controls.notes.hasError('maxlength')) { <mat-error>Not en fazla 2000 karakter olabilir.</mat-error> }</mat-form-field>
+        @if (form.controls.status.value === 'MAINTENANCE' || form.controls.status.value === 'LOST') { <p class="notes-hint"><mat-icon>edit_note</mat-icon>{{ form.controls.status.value === 'MAINTENANCE' ? 'Bakım nedenini ve yapılması gereken işlemi belirtin.' : 'Son bilinen konumu veya kayıp açıklamasını belirtin.' }}</p> }
       </section>
 
       @if (error()) { <p class="form-error">{{ error() }}</p> }
