@@ -32,6 +32,7 @@
               <mat-menu #bookMenu="matMenu">
                 <button mat-menu-item type="button" (click)="selectedBook.set(book)"><mat-icon>menu_book</mat-icon><span>Kitap detayları</span></button>
                 <a mat-menu-item routerLink="/catalog/copies" [queryParams]="{ bookId: book.id }"><mat-icon>inventory_2</mat-icon><span>Nüshaları görüntüle</span></a>
+                <a mat-menu-item routerLink="/circulation/loans" [queryParams]="{ status: 'ALL', bookId: book.id }"><mat-icon>history</mat-icon><span>Ödünç geçmişi</span></a>
                 <a mat-menu-item routerLink="/catalog/copies" [queryParams]="{ create: 'true', bookId: book.id }"><mat-icon>add_box</mat-icon><span>Yeni nüsha ekle</span></a>
                 <a mat-menu-item routerLink="/circulation/checkout" [queryParams]="{ bookId: book.id }" [class.disabled-action]="book.availableCopyCount === 0"><mat-icon>arrow_outward</mat-icon><span>Ödünç ver</span></a>
                 <button mat-menu-item type="button" (click)="openEdit(book)"><mat-icon>edit</mat-icon><span>Kitabı düzenle</span></button>

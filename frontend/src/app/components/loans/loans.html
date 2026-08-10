@@ -1,8 +1,37 @@
-<div class="loans-page"><header class="page-header"><div><h1>Ödünç işlemleri</h1></div><div><a mat-stroked-button routerLink="/circulation/return"><mat-icon>keyboard_return</mat-icon>İade al</a><a mat-flat-button routerLink="/circulation/checkout"><mat-icon>arrow_outward</mat-icon>Ödünç ver</a></div></header>
-  <section class="loans-card">@if (memberId()) { <div class="member-filter"><mat-icon>person</mat-icon><span>Üye no. {{ memberId() }} için işlemler gösteriliyor</span><button mat-button type="button" (click)="clearMemberFilter()">Tüm üyeleri göster</button></div> }<nav class="filters" aria-label="Ödünç alma durumu">@for (filter of filters; track filter.value) { <button type="button" [class.active]="status() === filter.value" (click)="changeStatus(filter.value)"><mat-icon>{{ filter.icon }}</mat-icon>{{ filter.label }}</button> }<span>{{ totalLoans() }} kayıt</span></nav>
+<div class="loans-page">
+  <header class="page-header">
+    <div><h1>Ödünç işlemleri</h1></div>
+    <div class="header-actions">
+      <app-expandable-search [query]="searchTerm()" placeholder="Kitap, nüsha, üye veya e-posta ara" (search)="searchTerm.set($event); search()" (clear)="clearSearch()" />
+      <app-filter-menu [activeCount]="activeFilterCount()" (apply)="applyFilters()" (clear)="clearFilters()">
+        <div class="loan-filters">
+          <mat-form-field appearance="outline" subscriptSizing="dynamic"><mat-label>Kitap</mat-label><mat-select [value]="bookId()" (valueChange)="selectBookFilter($event)"><mat-option [value]="null">Tüm kitaplar</mat-option>@for (book of books(); track book.id) { <mat-option [value]="book.id">{{ book.title }}</mat-option> }</mat-select></mat-form-field>
+          <mat-form-field appearance="outline" subscriptSizing="dynamic"><mat-label>Nüsha</mat-label><mat-select [value]="copyId()" [disabled]="!bookId() && !copyId()" (valueChange)="selectCopyFilter($event)"><mat-option [value]="null">Tüm nüshalar</mat-option>@for (copy of copies(); track copy.id) { <mat-option [value]="copy.id">{{ copy.inventoryNumber }}</mat-option> }</mat-select>@if (!bookId() && !copyId()) { <mat-hint>Önce kitap seçin</mat-hint> }</mat-form-field>
+          <div class="date-range">
+            <mat-form-field appearance="outline" subscriptSizing="dynamic"><mat-label>Ödünç başlangıcı</mat-label><input matInput type="date" [value]="checkoutFrom()" (input)="checkoutFrom.set($any($event.target).value)" /></mat-form-field>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic"><mat-label>Ödünç bitişi</mat-label><input matInput type="date" [value]="checkoutTo()" (input)="checkoutTo.set($any($event.target).value)" /></mat-form-field>
+          </div>
+          <div class="date-range">
+            <mat-form-field appearance="outline" subscriptSizing="dynamic"><mat-label>Son iade başlangıcı</mat-label><input matInput type="date" [value]="dueFrom()" (input)="dueFrom.set($any($event.target).value)" /></mat-form-field>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic"><mat-label>Son iade bitişi</mat-label><input matInput type="date" [value]="dueTo()" (input)="dueTo.set($any($event.target).value)" /></mat-form-field>
+          </div>
+          <mat-form-field appearance="outline" subscriptSizing="dynamic"><mat-label>İşlemi yapan görevli</mat-label><input matInput [value]="issuedBy()" (input)="issuedBy.set($any($event.target).value)" /></mat-form-field>
+          <mat-form-field appearance="outline" subscriptSizing="dynamic"><mat-label>Gecikme süresi</mat-label><mat-select [value]="overdueRange()" (valueChange)="overdueRange.set($event)"><mat-option value="">Tüm süreler</mat-option><mat-option value="1_7">1–7 gün</mat-option><mat-option value="8_30">8–30 gün</mat-option><mat-option value="30_PLUS">30 günden fazla</mat-option></mat-select></mat-form-field>
+        </div>
+      </app-filter-menu>
+      <app-sort-menu [options]="sortOptions" [value]="sortBy()" (valueChange)="changeSort($event)" />
+      <a mat-stroked-button routerLink="/circulation/return"><mat-icon>keyboard_return</mat-icon>İade al</a>
+      <a mat-flat-button routerLink="/circulation/checkout"><mat-icon>arrow_outward</mat-icon>Ödünç ver</a>
+    </div>
+  </header>
+  <section class="loans-card">
+    @if (memberId()) { <div class="member-filter"><mat-icon>person</mat-icon><span>Üye no. {{ memberId() }} için işlemler gösteriliyor</span><button mat-button type="button" (click)="clearMemberFilter()">Tüm üyeleri göster</button></div> }
+    @if (bookId()) { <div class="member-filter"><mat-icon>menu_book</mat-icon><span><strong>{{ bookFilterLabel() || 'Kitap yükleniyor' }}</strong> için işlemler gösteriliyor</span><button mat-button type="button" (click)="clearBookFilter()">Tüm kitapları göster</button></div> }
+    @if (copyId()) { <div class="member-filter"><mat-icon>inventory_2</mat-icon><span><strong>{{ copyFilterLabel() || 'Nüsha yükleniyor' }}</strong> için işlem geçmişi gösteriliyor</span><button mat-button type="button" (click)="clearCopyFilter()">Tüm nüshaları göster</button></div> }
+    <nav class="filters" aria-label="Ödünç alma durumu">@for (filter of filters; track filter.value) { <button type="button" [class.active]="status() === filter.value" (click)="changeStatus(filter.value)"><mat-icon>{{ filter.icon }}</mat-icon>{{ filter.label }}</button> }<span>{{ totalLoans() }} kayıt</span></nav>
     @if (error()) { <div class="error-banner"><mat-icon>error_outline</mat-icon><span>{{ error() }}</span><button mat-button type="button" (click)="loadLoans()">Tekrar dene</button></div> }
     @if (loading()) { <div class="state"><mat-icon>hourglass_top</mat-icon><h2>İşlemler yükleniyor</h2></div> }
-    @else if (!loans().length) { <div class="state"><mat-icon>receipt_long</mat-icon><h2>Bu görünümde işlem bulunmuyor</h2><p>{{ status() === 'OVERDUE' ? 'Gecikmiş ödünç kaydı yok.' : 'Yeni bir ödünç işlemi oluşturabilirsiniz.' }}</p></div> }
+    @else if (!loans().length) { <div class="state"><mat-icon>receipt_long</mat-icon><h2>Eşleşen işlem bulunmuyor</h2><p>{{ searchTerm() || activeFilterCount() ? 'Arama veya filtre seçimlerinizi değiştirerek tekrar deneyin.' : status() === 'OVERDUE' ? 'Gecikmiş ödünç kaydı yok.' : 'Yeni bir ödünç işlemi oluşturabilirsiniz.' }}</p></div> }
     @else { <div class="loan-table" role="table" aria-label="Ödünç kayıtları"><div class="table-head" role="row"><span>Kitap ve nüsha</span><span>Üye</span><span>Ödünç / son iade</span><span>Durum</span><span>Görevli</span><span>İşlem</span></div>
       @for (loan of loans(); track loan.id) { <article role="row"><div class="book"><span><mat-icon>menu_book</mat-icon></span><div><strong>{{ loan.bookCopy.book.title }}</strong><small>{{ loan.bookCopy.inventoryNumber }}</small></div></div><div class="member"><strong>{{ loan.member.firstName }} {{ loan.member.lastName }}</strong><small>Üye no. {{ loan.member.id }}</small></div><div class="dates"><span>{{ formatDate(loan.checkoutDate) }}</span><small>{{ loan.returnDate ? 'İade: ' + formatDate(loan.returnDate) : 'Son tarih: ' + formatDate(loan.dueDate) }}</small></div><span [class]="'loan-status ' + stateClass(loan)">{{ loanState(loan) }}</span><span class="staff">{{ loan.issuedBy }}</span>@if (!loan.returnDate) { <a class="return-action" mat-stroked-button routerLink="/circulation/return" [queryParams]="{ inventoryNumber: loan.bookCopy.inventoryNumber }"><mat-icon>keyboard_return</mat-icon>İade al</a> } @else { <span></span> }</article> }
     </div> }
