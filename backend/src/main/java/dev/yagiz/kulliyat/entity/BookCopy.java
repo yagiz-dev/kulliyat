@@ -18,6 +18,9 @@ public class BookCopy {
     // örn. "2. kat, Tarih bölümü, 4. raf"
     private String physicalLocation;
 
+    @Column(columnDefinition = "TEXT")
+    private String notes;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private CopyStatus status = CopyStatus.AVAILABLE;
@@ -48,6 +51,14 @@ public class BookCopy {
 
     public void setPhysicalLocation(String physicalLocation) {
         this.physicalLocation = physicalLocation;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
     }
 
     public CopyStatus getStatus() {

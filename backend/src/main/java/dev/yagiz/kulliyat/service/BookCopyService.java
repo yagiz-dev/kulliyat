@@ -24,13 +24,14 @@ public class BookCopyService {
         this.bookRepository = bookRepository;
     }
 
-    public BookCopy addCopyToBook(Long bookId, String physicalLocation) {
+    public BookCopy addCopyToBook(Long bookId, String physicalLocation, String notes) {
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Book not found"));
         Long nextId = bookCopyRepository.findMaxId() + 1;
         BookCopy copy = new BookCopy();
         copy.setInventoryNumber(String.format("TOFAS-KTP-%05d", nextId));
         copy.setPhysicalLocation(physicalLocation);
+        copy.setNotes(normalizeNotes(notes));
         copy.setStatus(CopyStatus.AVAILABLE);
         copy.setBook(book);
         return bookCopyRepository.save(copy);
@@ -57,6 +58,7 @@ public class BookCopyService {
     public BookCopy updateCopy(Long id, UpdateCopyRequest request) {
         BookCopy copy = getCopy(id);
         if (request.physicalLocation() != null) copy.setPhysicalLocation(request.physicalLocation());
+        if (request.notes() != null) copy.setNotes(normalizeNotes(request.notes()));
         if (request.status() != null) {
             if (copy.getStatus() == CopyStatus.LOANED && request.status() != CopyStatus.LOANED) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "Ödünç verilmiş bir kitabın durumunu buradan güncelleyemezsiniz. Lütfen iade al menüsünü kullanınız.");
@@ -64,5 +66,9 @@ public class BookCopyService {
             copy.setStatus(request.status());
         }
         return bookCopyRepository.save(copy);
+    }
+
+    private String normalizeNotes(String notes) {
+        return notes == null || notes.isBlank() ? null : notes.trim();
     }
 }

@@ -73,10 +73,10 @@ public final class ApiDtos {
         }
     }
 
-    public record BookCopyResponse(Long id, String inventoryNumber, String physicalLocation, CopyStatus status,
+    public record BookCopyResponse(Long id, String inventoryNumber, String physicalLocation, String notes, CopyStatus status,
                                    BookSummary book) {
         public static BookCopyResponse from(BookCopy copy) {
-            return new BookCopyResponse(copy.getId(), copy.getInventoryNumber(), copy.getPhysicalLocation(),
+            return new BookCopyResponse(copy.getId(), copy.getInventoryNumber(), copy.getPhysicalLocation(), copy.getNotes(),
                     copy.getStatus(), BookSummary.from(copy.getBook()));
         }
     }
@@ -121,8 +121,8 @@ public final class ApiDtos {
                               @NotNull Genre genre, String coverImageUrl, Long publisherId, List<Long> authorIds) {}
     public record MemberRequest(@NotBlank String firstName, @NotBlank String lastName, @NotBlank @Email String email,
                                 String phoneNumber) {}
-    public record AddCopyRequest(String physicalLocation) {}
-    public record UpdateCopyRequest(String physicalLocation, CopyStatus status) {}
+    public record AddCopyRequest(String physicalLocation, @Size(max = 2000) String notes) {}
+    public record UpdateCopyRequest(String physicalLocation, @Size(max = 2000) String notes, CopyStatus status) {}
     public record CopyLabelRequest(@NotEmpty @Size(max = 500) List<@NotNull Long> copyIds,
                                    @Min(1) @Max(20) Integer startPosition) {}
     public record CheckoutRequest(@NotNull Long memberId, @NotBlank String inventoryNumber) {}
