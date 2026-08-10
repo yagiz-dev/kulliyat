@@ -10,7 +10,10 @@ import dev.yagiz.kulliyat.entity.Staff;
 import dev.yagiz.kulliyat.enums.CopyStatus;
 import dev.yagiz.kulliyat.enums.Genre;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import org.springframework.data.domain.Page;
@@ -120,6 +123,8 @@ public final class ApiDtos {
                                 String phoneNumber) {}
     public record AddCopyRequest(String physicalLocation) {}
     public record UpdateCopyRequest(String physicalLocation, CopyStatus status) {}
+    public record CopyLabelRequest(@NotEmpty @Size(max = 500) List<@NotNull Long> copyIds,
+                                   @Min(1) @Max(20) Integer startPosition) {}
     public record CheckoutRequest(@NotNull Long memberId, @NotBlank String inventoryNumber) {}
     public record ReturnRequest(@NotBlank String inventoryNumber) {}
 }

@@ -2,11 +2,15 @@ package dev.yagiz.kulliyat.controller;
 
 import dev.yagiz.kulliyat.dto.ApiDtos.AddCopyRequest;
 import dev.yagiz.kulliyat.dto.ApiDtos.BookCopyResponse;
+import dev.yagiz.kulliyat.dto.ApiDtos.CopyLabelRequest;
 import dev.yagiz.kulliyat.dto.ApiDtos.PageResponse;
 import dev.yagiz.kulliyat.dto.ApiDtos.UpdateCopyRequest;
 import dev.yagiz.kulliyat.enums.CopyStatus;
 import dev.yagiz.kulliyat.service.BookCopyService;
+import dev.yagiz.kulliyat.service.CopyLabelService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,8 +18,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api")
 public class BookCopyController {
     private final BookCopyService bookCopyService;
+    private final CopyLabelService copyLabelService;
 
-    public BookCopyController(BookCopyService bookCopyService) { this.bookCopyService = bookCopyService; }
+    public BookCopyController(BookCopyService bookCopyService, CopyLabelService copyLabelService) {
+        this.bookCopyService = bookCopyService;
+        this.copyLabelService = copyLabelService;
+    }
 
     @PostMapping("/books/{bookId}/copies")
     public ResponseEntity<BookCopyResponse> addCopy(@PathVariable Long bookId, @RequestBody AddCopyRequest request) {
@@ -43,5 +51,13 @@ public class BookCopyController {
     @PatchMapping("/copies/{id}")
     public ResponseEntity<BookCopyResponse> updateCopy(@PathVariable Long id, @Valid @RequestBody UpdateCopyRequest request) {
         return ResponseEntity.ok(BookCopyResponse.from(bookCopyService.updateCopy(id, request)));
+    }
+
+    @PostMapping(value = "/copies/labels", produces = MediaType.APPLICATION_PDF_VALUE)
+    public ResponseEntity<byte[]> createLabels(@Valid @RequestBody CopyLabelRequest request) {
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"kulliyat-etiketleri.pdf\"")
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(copyLabelService.createLabels(request));
     }
 }
