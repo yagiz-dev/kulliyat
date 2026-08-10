@@ -17,7 +17,7 @@
         @if (selectedCopy(); as copy) { <div class="copy-result" [class.unavailable]="copy.status !== 'AVAILABLE'"><mat-icon>{{ copy.status === 'AVAILABLE' ? 'check_circle' : 'block' }}</mat-icon><div><strong>{{ copy.book.title }}</strong><span>{{ copy.inventoryNumber }} · {{ copy.physicalLocation || 'Konum belirtilmemiş' }}</span><small>{{ copy.status === 'AVAILABLE' ? 'Ödünç verilebilir' : 'Bu nüsha şu anda ödünç verilemez' }}</small></div></div> }
       </section>
 
-      <section class="confirmation-card"><div><h2>İşlemi onaylayın</h2><p>Ödünç süresi sistem politikaları gereği 14 gün olarak ayarlanmıştır.</p></div><button mat-flat-button type="button" [disabled]="!selectedMember() || selectedCopy()?.status !== 'AVAILABLE' || submitting()" (click)="checkout()">{{ submitting() ? 'İşleniyor…' : 'Ödünç ver' }}</button></section>
+      <section class="confirmation-card"><div><h2>İşlemi onaylayın</h2><p>Ödünç verme süresi sistem politikaları gereği 14 gün olarak ayarlanmıştır.</p></div><button mat-flat-button type="button" [disabled]="!selectedMember() || selectedCopy()?.status !== 'AVAILABLE' || submitting()" (click)="checkout()">{{ submitting() ? 'İşleniyor…' : 'Ödünç ver' }}</button></section>
     </div>
     @if (error()) { <div class="error-banner"><mat-icon>error_outline</mat-icon>{{ error() }}</div> }
   }

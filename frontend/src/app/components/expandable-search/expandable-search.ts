@@ -16,6 +16,7 @@ import { MatInputModule } from '@angular/material/input';
 export class ExpandableSearchComponent implements OnChanges {
   @Input() query = '';
   @Input() placeholder = 'Ara';
+  @Input() prefixIcon = '';
   @Input() disabled = false;
   @Output() search = new EventEmitter<string>();
   @Output() clear = new EventEmitter<void>();
@@ -23,6 +24,10 @@ export class ExpandableSearchComponent implements OnChanges {
 
   readonly expanded = signal(false);
   draft = '';
+
+  resolvedPrefixIcon(): string {
+    return this.prefixIcon || (this.placeholder.toLocaleLowerCase('tr-TR').includes('envanter numarası') ? 'qr_code_scanner' : '');
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['query']) {

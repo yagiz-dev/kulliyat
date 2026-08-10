@@ -4,5 +4,6 @@
 .search-toggle:hover { border-color: #caa5ae; background: var(--brand-100); }
 .search-form { width: 100%; display: flex; align-items: center; gap: 8px; }
 .search-form mat-form-field { min-width: 0; flex: 1; }
+.search-form mat-icon[matprefix] { margin-right: 8px; color: var(--brand-700); }
 .search-form > button { height: 56px; padding: 0 22px; border-radius: 8px; flex: none; }
 @media (max-width: 720px) { :host(.expanded) { width: 100%; order: 2; } .search-form { width: 100%; } }
