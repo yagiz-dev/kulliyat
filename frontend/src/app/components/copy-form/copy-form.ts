@@ -76,6 +76,21 @@ export class CopyFormComponent implements OnChanges {
       .subscribe({ next: (response) => this.books.set(response.content), error: (error) => this.error.set(apiErrorMessage(error)) });
   }
 
+  selectBook(book: Book): void {
+    this.selectedBook.set(book);
+    this.bookSearch.set('');
+    this.books.set([]);
+    this.bookSearchPerformed.set(false);
+    this.error.set('');
+  }
+
+  clearSelectedBook(): void {
+    this.selectedBook.set(null);
+    this.bookSearch.set('');
+    this.books.set([]);
+    this.bookSearchPerformed.set(false);
+  }
+
   coverUrl(book: Book): string | null {
     const value = book.coverImageUrl?.trim();
     if (!value) return null;
@@ -89,7 +104,7 @@ export class CopyFormComponent implements OnChanges {
     const notes = this.form.controls.notes.value.trim();
     const request = this.copy
       ? this.copyService.update(this.copy.id, { physicalLocation: location, notes, status: this.copy.status === 'LOANED' ? undefined : this.form.controls.status.value })
-      : this.copyService.add(this.selectedBook()!.id, location, notes);
+      : this.copyService.add(this.selectedBook()!.id, location, notes, this.form.controls.status.value);
     this.submitting.set(true);
     this.error.set('');
     request.pipe(finalize(() => this.submitting.set(false))).subscribe({

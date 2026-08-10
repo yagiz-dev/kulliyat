@@ -22,8 +22,8 @@ export class CopyService {
     return this.http.get<PageResponse<BookCopy>>(`${environment.apiUrl}/copies`, { params });
   }
   get(id: number): Observable<BookCopy> { return this.http.get<BookCopy>(`${environment.apiUrl}/copies/${id}`); }
-  add(bookId: number, physicalLocation: string, notes = ''): Observable<BookCopy> {
-    return this.http.post<BookCopy>(`${environment.apiUrl}/books/${bookId}/copies`, { physicalLocation, notes });
+  add(bookId: number, physicalLocation: string, notes = '', status: CopyStatus = 'AVAILABLE'): Observable<BookCopy> {
+    return this.http.post<BookCopy>(`${environment.apiUrl}/books/${bookId}/copies`, { physicalLocation, notes, status });
   }
   update(id: number, request: UpdateCopyRequest): Observable<BookCopy> {
     return this.http.patch<BookCopy>(`${environment.apiUrl}/copies/${id}`, request);

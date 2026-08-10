@@ -71,6 +71,7 @@ export class InventoryComponent {
 
   constructor() {
     const query = this.route.snapshot.queryParamMap;
+    this.searchTerm.set(query.get('search') || '');
     this.statusFilter.set((query.get('status') as CopyStatus) || '');
     this.locationFilter.set(query.get('location') || '');
     this.bookFilter.set(query.get('bookId') ? Number(query.get('bookId')) : null);
@@ -94,12 +95,13 @@ export class InventoryComponent {
       });
   }
 
-  search(): void { this.currentPage = 0; this.loadCopies(); }
+  search(): void { this.currentPage = 0; this.syncSearchUrl(); this.loadCopies(); }
   clearSearch(): void { this.searchTerm.set(''); this.search(); }
   applyFilters(): void { this.currentPage = 0; this.syncFilterUrl(); this.loadCopies(); }
   clearFilters(): void { this.statusFilter.set(''); this.locationFilter.set(''); this.bookFilter.set(null); this.applyFilters(); }
   changeSort(value: string): void { this.sortBy.set(value); this.currentPage = 0; void this.router.navigate([], { relativeTo: this.route, queryParamsHandling: 'merge', queryParams: { sort: value === 'inventoryNumber,asc' ? null : value } }); this.loadCopies(); }
   private syncFilterUrl(): void { void this.router.navigate([], { relativeTo: this.route, queryParamsHandling: 'merge', queryParams: { status: this.statusFilter() || null, location: this.locationFilter().trim() || null, bookId: this.bookFilter() } }); }
+  private syncSearchUrl(): void { void this.router.navigate([], { relativeTo: this.route, queryParamsHandling: 'merge', queryParams: { search: this.searchTerm().trim() || null } }); }
   onPageChange(event: PageEvent): void { this.currentPage = event.pageIndex; this.pageSize = event.pageSize; this.loadCopies(); }
 
   isSelected(copy: BookCopy): boolean { return this.selectedCopyIds().has(copy.id); }
@@ -141,7 +143,18 @@ export class InventoryComponent {
     const wasCreate = !this.editingCopy();
     this.formOpen.set(false);
     this.editingCopy.set(null);
-    if (wasCreate) this.createdCopy.set(copy);
+    if (wasCreate) {
+      this.createdCopy.set(copy);
+      this.searchTerm.set(copy.inventoryNumber);
+      this.statusFilter.set('');
+      this.locationFilter.set('');
+      this.bookFilter.set(null);
+      this.currentPage = 0;
+      this.clearSelection();
+      void this.router.navigate([], { relativeTo: this.route, queryParamsHandling: 'merge', queryParams: {
+        search: copy.inventoryNumber, status: null, location: null, bookId: null, create: null,
+      } });
+    }
     this.loadCopies();
   }
 }

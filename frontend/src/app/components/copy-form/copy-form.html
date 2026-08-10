@@ -6,20 +6,23 @@
       @if (!copy) {
         <section class="book-selector">
           <h3>1. Kitabı seçin</h3>
-          @if (selectedBook(); as selected) { <div class="selected-book"><span class="book-cover">@if (coverUrl(selected); as cover) { <img [src]="cover" alt="" /> } @else { {{ selected.title.charAt(0) }} }</span><span><strong>{{ selected.title }}</strong><small>ISBN {{ selected.isbn }}</small></span><mat-icon>check_circle</mat-icon></div> }
-          <div class="book-search"><mat-form-field appearance="outline" subscriptSizing="dynamic"><mat-label>Kitap adına göre ara</mat-label><mat-icon matPrefix>search</mat-icon><input matInput [value]="bookSearch()" (input)="bookSearch.set($any($event.target).value)" (keydown.enter)="$event.preventDefault(); searchBooks()" /></mat-form-field><button mat-stroked-button type="button" [disabled]="!bookSearch().trim()" (click)="searchBooks()">Ara</button></div>
-          @if (bookSearchPerformed()) {
-            @if (loadingBooks()) { <p class="hint">Kitaplar yükleniyor…</p> }
-            @else {
-            <div class="book-options">
-              @for (book of books(); track book.id) {
-                <button type="button" [class.selected]="selectedBook()?.id === book.id" (click)="selectedBook.set(book)">
-                  <span class="book-cover">@if (coverUrl(book); as cover) { <img [src]="cover" alt="" /> } @else { {{ book.title.charAt(0) }} }</span>
-                  <span><strong>{{ book.title }}</strong><small>ISBN {{ book.isbn }}</small></span>
-                  <mat-icon>{{ selectedBook()?.id === book.id ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
-                </button>
-              } @empty { <p class="hint">Eşleşen kitap bulunamadı.</p> }
-            </div>
+          @if (selectedBook(); as selected) {
+            <button class="selected-book" type="button" aria-label="Kitap seçimini değiştir" (click)="clearSelectedBook()"><span class="book-cover">@if (coverUrl(selected); as cover) { <img [src]="cover" alt="" /> } @else { {{ selected.title.charAt(0) }} }</span><span><strong>{{ selected.title }}</strong><small>ISBN {{ selected.isbn }}</small></span><span class="change-book">Değiştir</span><mat-icon>close</mat-icon></button>
+          } @else {
+            <div class="book-search"><mat-form-field appearance="outline" subscriptSizing="dynamic"><mat-label>Kitap adına göre ara</mat-label><mat-icon matPrefix>search</mat-icon><input matInput [value]="bookSearch()" (input)="bookSearch.set($any($event.target).value)" (keydown.enter)="$event.preventDefault(); searchBooks()" /></mat-form-field><button mat-stroked-button type="button" [disabled]="!bookSearch().trim()" (click)="searchBooks()">Ara</button></div>
+            @if (bookSearchPerformed()) {
+              @if (loadingBooks()) { <p class="hint">Kitaplar yükleniyor…</p> }
+              @else {
+              <div class="book-options">
+                @for (book of books(); track book.id) {
+                  <button type="button" (click)="selectBook(book)">
+                    <span class="book-cover">@if (coverUrl(book); as cover) { <img [src]="cover" alt="" /> } @else { {{ book.title.charAt(0) }} }</span>
+                    <span><strong>{{ book.title }}</strong><small>ISBN {{ book.isbn }}</small></span>
+                    <mat-icon>chevron_right</mat-icon>
+                  </button>
+                } @empty { <p class="hint">Eşleşen kitap bulunamadı.</p> }
+              </div>
+              }
             }
           }
         </section>
@@ -30,8 +33,8 @@
       <section class="copy-fields">
         <h3>{{ copy ? 'Nüsha bilgileri' : '2. Yerleşim bilgisi' }}</h3>
         <mat-form-field appearance="outline"><mat-label>Fiziksel konum</mat-label><input matInput formControlName="physicalLocation" placeholder="Örn. 2. kat, 4. raf" /></mat-form-field>
+        <mat-form-field appearance="outline"><mat-label>Durum</mat-label><mat-select formControlName="status" [disabled]="copy?.status === 'LOANED'">@for (status of statuses; track status.value) { <mat-option [value]="status.value">{{ status.label }}</mat-option> }</mat-select></mat-form-field>
         @if (copy) {
-          <mat-form-field appearance="outline"><mat-label>Durum</mat-label><mat-select formControlName="status" [disabled]="copy.status === 'LOANED'">@for (status of statuses; track status.value) { <mat-option [value]="status.value">{{ status.label }}</mat-option> }</mat-select></mat-form-field>
           @if (copy.status === 'LOANED') { <p class="loan-note"><mat-icon>info</mat-icon>Ödünçteki nüshanın durumu yalnızca iade işlemiyle değiştirilebilir.</p> }
         }
         <mat-form-field class="notes-field" appearance="outline" [class.attention]="form.controls.status.value === 'MAINTENANCE' || form.controls.status.value === 'LOST'"><mat-label>Nüsha notları</mat-label><textarea matInput formControlName="notes" rows="4" maxlength="2000" placeholder="Bakım, hasar, kayıp veya yerleşimle ilgili açıklamalar"></textarea><mat-hint align="end">{{ form.controls.notes.value.length }}/2000</mat-hint>@if (form.controls.notes.hasError('maxlength')) { <mat-error>Not en fazla 2000 karakter olabilir.</mat-error> }</mat-form-field>
