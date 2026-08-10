@@ -1,5 +1,5 @@
-export interface Author { id: number; name: string; }
-export interface Publisher { id: number; name: string; }
+export interface Author { id: number; name: string; bookCount: number; totalCopyCount: number; availableCopyCount: number; }
+export interface Publisher { id: number; name: string; bookCount: number; totalCopyCount: number; availableCopyCount: number; }
 export type Genre = 'KURGU' | 'KURGU_DISI' | 'BILIMKURGU' | 'FANTASTIK' | 'GIZEM' | 'TARIH' | 'BIYOGRAFI' | 'TEKNOLOJI';
 
 export interface Book {

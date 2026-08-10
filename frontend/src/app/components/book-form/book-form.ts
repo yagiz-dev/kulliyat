@@ -21,6 +21,8 @@ export class BookFormComponent implements OnChanges {
   @Input() book: Book | null = null;
   @Input() authors: Author[] = [];
   @Input() publishers: Publisher[] = [];
+  @Input() initialAuthorId: number | null = null;
+  @Input() initialPublisherId: number | null = null;
   @Input() submitting = false;
   @Input() error = '';
   @Output() save = new EventEmitter<BookRequest>();
@@ -49,15 +51,15 @@ export class BookFormComponent implements OnChanges {
   });
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (!changes['book']) return;
+    if (!changes['book'] && !changes['initialAuthorId'] && !changes['initialPublisherId']) return;
     const book = this.book;
     this.form.reset({
       title: book?.title ?? '',
       isbn: book?.isbn ?? '',
       publicationYear: book?.publicationYear ?? null,
       genre: book?.genre ?? 'KURGU',
-      publisherId: book?.publisher?.id ?? null,
-      authorIds: book?.authors.map((author) => author.id) ?? [],
+      publisherId: book?.publisher?.id ?? this.initialPublisherId,
+      authorIds: book?.authors.map((author) => author.id) ?? (this.initialAuthorId ? [this.initialAuthorId] : []),
       coverImageUrl: book?.coverImageUrl ?? null,
       summary: book?.summary ?? null,
     });

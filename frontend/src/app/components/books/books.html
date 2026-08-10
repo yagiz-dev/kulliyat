@@ -49,7 +49,7 @@
   }
 </div>
 
-@if (formOpen()) { <app-book-form [book]="editingBook()" [authors]="authors()" [publishers]="publishers()" [submitting]="submitting()" [error]="formError()" (save)="saveBook($event)" (cancel)="closeForm()" /> }
+@if (formOpen()) { <app-book-form [book]="editingBook()" [authors]="authors()" [publishers]="publishers()" [initialAuthorId]="authorFilter()" [initialPublisherId]="publisherFilter()" [submitting]="submitting()" [error]="formError()" (save)="saveBook($event)" (cancel)="closeForm()" /> }
 
 @if (selectedBook(); as book) {
   <app-book-detail [book]="book" (close)="selectedBook.set(null)" (edit)="openEdit($event)" (remove)="removeBook($event)" />

@@ -65,6 +65,7 @@ export class BooksComponent {
 
   constructor() {
     const query = this.route.snapshot.queryParamMap;
+    this.searchTerm.set(query.get('search') || '');
     this.sortBy.set(query.get('sort') || 'title,asc');
     this.genreFilter.set((query.get('genre') as Genre) || '');
     this.authorFilter.set(query.get('authorId') ? Number(query.get('authorId')) : null);

@@ -32,7 +32,9 @@ export class BookService {
   createAuthor(name: string): Observable<Author> { return this.http.post<Author>(`${environment.apiUrl}/authors`, { name }); }
   updateAuthor(id: number, name: string): Observable<Author> { return this.http.put<Author>(`${environment.apiUrl}/authors/${id}`, { name }); }
   deleteAuthor(id: number): Observable<void> { return this.http.delete<void>(`${environment.apiUrl}/authors/${id}`); }
+  mergeAuthor(sourceId: number, targetId: number): Observable<void> { return this.http.post<void>(`${environment.apiUrl}/authors/${sourceId}/merge/${targetId}`, {}); }
   createPublisher(name: string): Observable<Publisher> { return this.http.post<Publisher>(`${environment.apiUrl}/publishers`, { name }); }
   updatePublisher(id: number, name: string): Observable<Publisher> { return this.http.put<Publisher>(`${environment.apiUrl}/publishers/${id}`, { name }); }
   deletePublisher(id: number): Observable<void> { return this.http.delete<void>(`${environment.apiUrl}/publishers/${id}`); }
+  mergePublisher(sourceId: number, targetId: number): Observable<void> { return this.http.post<void>(`${environment.apiUrl}/publishers/${sourceId}/merge/${targetId}`, {}); }
 }
