@@ -39,53 +39,43 @@ public class LoanService {
     // birinde hata olursa diğerinin de geri alınmasını sağlıyoruz.
     @Transactional
     public Loan checkoutBook(Long memberId, String inventoryNumber) {
-        // Find the member
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Ziyaretçi bulunamadı"));
 
-        // Find the specific physical copy by its barcode/inventory number
         BookCopy copy = bookCopyRepository.findByInventoryNumber(inventoryNumber)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Fiziksel kitap kaydı bulunamadı"));
 
-        // Is it actually on the shelf and available to loan?
         if (copy.getStatus() != CopyStatus.AVAILABLE) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bu kitap şu anda " + copy.getStatus() + " olarak işaretlendiğinden ödünç alınamaz.");
         }
 
-        // Update the physical copy's status
         copy.setStatus(CopyStatus.LOANED);
         bookCopyRepository.save(copy);
 
-        // Get the username of the currently logged-in Admin from the JWT
+        // Aktif adminin kullanıcı adını al
         String issuedBy = SecurityContextHolder.getContext().getAuthentication().getName();
 
-        // Create the loan record
         Loan loan = new Loan();
         loan.setMember(member);
         loan.setBookCopy(copy);
         loan.setCheckoutDate(LocalDate.now());
-        loan.setDueDate(LocalDate.now().plusDays(14)); // Standard 2-week checkout period
+        loan.setDueDate(LocalDate.now().plusDays(14)); // @todo: Bunu ayarlanabilir yap
         loan.setIssuedBy(issuedBy);
-        // returnDate is intentionally left null!
 
         return loanRepository.save(loan);
     }
 
     @Transactional
     public Loan returnBook(String inventoryNumber) {
-        // Find the active loan for this specific physical copy
         Loan activeLoan = loanRepository.findByBookCopy_InventoryNumberAndReturnDateIsNull(inventoryNumber)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bu kitap şu anda ödünç alınmış gözükmüyor."));
 
-        // Mark the return date as today
         activeLoan.setReturnDate(LocalDate.now());
 
-        // Update the physical copy's status back to AVAILABLE
         BookCopy copy = activeLoan.getBookCopy();
         copy.setStatus(CopyStatus.AVAILABLE);
         bookCopyRepository.save(copy);
 
-        // Save and return the updated loan record
         return loanRepository.save(activeLoan);
     }
 

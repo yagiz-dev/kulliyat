@@ -14,16 +14,11 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     boolean existsByEmail(String email);
 
     boolean existsByPhoneNumber(String phoneNumber);
-
-    @Query("SELECT m FROM Member m WHERE " +
-            "LOWER(m.firstName) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
-            "LOWER(m.lastName) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
-            "LOWER(m.email) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
-    Page<Member> searchMembers(@Param("searchTerm") String searchTerm, Pageable pageable);
-
     @Query(value = "SELECT m FROM Member m WHERE " +
             "(:search IS NULL OR LOWER(m.firstName) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
-            "LOWER(m.lastName) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(m.email) LIKE LOWER(CONCAT('%', :search, '%'))) AND " +
+            "LOWER(m.lastName) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+            "LOWER(CONCAT(m.firstName, ' ', m.lastName)) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+            "LOWER(m.email) LIKE LOWER(CONCAT('%', :search, '%'))) AND " +
             "(:joinedFrom IS NULL OR m.joinedAt >= :joinedFrom) AND " +
             "(:joinedTo IS NULL OR m.joinedAt < :joinedTo) AND " +
             "(:loanState IS NULL OR " +
