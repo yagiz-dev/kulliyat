@@ -39,8 +39,8 @@ export class ReturnComponent {
       switchMap((response) => {
         const copy = response.content.find((item) => item.inventoryNumber.toUpperCase() === inventory.toUpperCase()) ?? null;
         if (!copy || copy.status !== 'LOANED') return of({ copy, loan: null });
-        return this.loanService.list('ACTIVE', 0, 1000).pipe(
-          map((loans) => ({ copy, loan: loans.content.find((loan) => loan.bookCopy.id === copy.id) ?? null })),
+        return this.loanService.list('ACTIVE', 0, 1, undefined, { copyId: copy.id }).pipe(
+          map((loans) => ({ copy, loan: loans.content[0] ?? null })),
         );
       }),
       finalize(() => this.checking.set(false)),
