@@ -36,7 +36,7 @@ public class MemberController {
 
     @GetMapping("/{id}")
     public ResponseEntity<MemberResponse> getMember(@PathVariable Long id) {
-        return ResponseEntity.ok(MemberResponse.from(memberService.getMember(id)));
+        return ResponseEntity.ok(memberService.getMemberResponse(id));
     }
 
     @PutMapping("/{id}")

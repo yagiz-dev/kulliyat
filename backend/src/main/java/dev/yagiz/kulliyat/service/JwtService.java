@@ -4,6 +4,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.Claims;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -13,8 +14,12 @@ import java.util.Date;
 @Service
 public class JwtService {
 
-    // prod geçerken bunu .env ya da Vault'a taşıyacağım
-    private static final String SECRET = "8a52932f91a5611488c5efb4cc194b1a4ef6e174b2679237db8f376cc6b595fa";
+    private final SecretKey signingKey;
+
+    public JwtService(@Value("${app.security.jwt-secret}") String secret) {
+        byte[] keyBytes = Decoders.BASE64.decode(secret);
+        this.signingKey = Keys.hmacShaKeyFor(keyBytes);
+    }
 
     public String generateToken(String username, String role) {
         return Jwts.builder()
@@ -27,8 +32,7 @@ public class JwtService {
     }
 
     private SecretKey getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET);
-        return Keys.hmacShaKeyFor(keyBytes);
+        return signingKey;
     }
 
     public String extractUsername(String token) {

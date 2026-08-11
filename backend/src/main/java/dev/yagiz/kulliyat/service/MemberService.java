@@ -40,6 +40,12 @@ public class MemberService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Üye kaydı bulunamadı"));
     }
 
+    public MemberResponse getMemberResponse(Long id) {
+        Member member = getMember(id);
+        long[] counts = loanCountsFor(List.of(id)).getOrDefault(id, new long[] { 0, 0, 0 });
+        return MemberResponse.from(member, counts[0], counts[1], counts[2]);
+    }
+
     public Page<MemberResponse> getAllMembers(String search, LocalDate joinedFrom, LocalDate joinedTo, String loanState,
                                               int page, int size, String sortBy, String sortDirection) {
         String property = switch (sortBy) {
@@ -51,16 +57,24 @@ public class MemberService {
         Page<Member> members = memberRepository.filter(normalize(search), joinedFrom == null ? null : joinedFrom.atStartOfDay(),
                 joinedTo == null ? null : joinedTo.plusDays(1).atStartOfDay(), normalize(loanState), LocalDate.now(), pageable);
         List<Long> memberIds = members.getContent().stream().map(Member::getId).toList();
-        Map<Long, long[]> counts = new HashMap<>();
-        if (!memberIds.isEmpty()) {
-            for (Object[] row : loanRepository.countOpenLoansByMemberIds(memberIds, LocalDate.now())) {
-                counts.put((Long) row[0], new long[] { ((Number) row[1]).longValue(), ((Number) row[2]).longValue(), ((Number) row[3]).longValue() });
-            }
-        }
+        Map<Long, long[]> counts = loanCountsFor(memberIds);
         return members.map(member -> {
             long[] memberCounts = counts.getOrDefault(member.getId(), new long[] { 0, 0, 0 });
             return MemberResponse.from(member, memberCounts[0], memberCounts[1], memberCounts[2]);
         });
+    }
+
+    private Map<Long, long[]> loanCountsFor(List<Long> memberIds) {
+        Map<Long, long[]> counts = new HashMap<>();
+        if (memberIds.isEmpty()) return counts;
+        for (Object[] row : loanRepository.countOpenLoansByMemberIds(memberIds, LocalDate.now())) {
+            counts.put((Long) row[0], new long[] {
+                    ((Number) row[1]).longValue(),
+                    ((Number) row[2]).longValue(),
+                    ((Number) row[3]).longValue()
+            });
+        }
+        return counts;
     }
 
     private String normalize(String value) { return value == null || value.isBlank() ? null : value.trim(); }
