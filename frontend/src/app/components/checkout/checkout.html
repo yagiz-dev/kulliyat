@@ -5,16 +5,42 @@
     <section class="success-card"><span class="success-icon"><mat-icon>check</mat-icon></span><p class="eyebrow">İşlem tamamlandı</p><h2>{{ loan.bookCopy.book.title }} ödünç verildi</h2><p><b>{{ loan.member.firstName }} {{ loan.member.lastName }}</b> adına oluşturulan ödünç kaydı <b>{{ formatDate(loan.dueDate) }}</b> tarihinde sona erecek.</p><dl><div><dt>ENVANTER NO.</dt><dd>{{ loan.bookCopy.inventoryNumber }}</dd></div><div><dt>İŞLEMİ YAPAN</dt><dd>{{ loan.issuedBy }}</dd></div><div><dt>ÖDÜNÇ TARİHİ</dt><dd>{{ formatDate(loan.checkoutDate) }}</dd></div><div><dt>SON İADE TARİHİ</dt><dd>{{ formatDate(loan.dueDate) }}</dd></div></dl><div><button mat-flat-button type="button" (click)="reset()">Yeni işlem</button><a mat-button routerLink="/circulation/loans">İşlemleri görüntüle</a></div></section>
   } @else {
     <div class="workflow-grid">
-      <section class="workflow-card">
+      <section class="workflow-card member-workflow">
         <header><span>1</span><div><h2>Üyeyi seçin</h2><p>Ad, soyad veya e-posta ile arayın.</p></div></header>
-        @if (selectedMember(); as member) { <div class="selected-member"><span class="avatar">{{ initials(member) }}</span><div><strong>{{ member.firstName }} {{ member.lastName }}</strong><small>{{ member.email }}</small></div><button mat-button type="button" (click)="selectedMember.set(null)">Değiştir</button></div> }
+        @if (selectedMember(); as member) {
+          <div class="selected-member"><span class="avatar">{{ initials(member) }}</span><div><strong>{{ member.firstName }} {{ member.lastName }}</strong><small>{{ member.email }}</small></div><button mat-button type="button" (click)="selectedMember.set(null)">Değiştir</button></div>
+          <div class="member-alerts">
+            <div class="member-alert info"><mat-icon>info</mat-icon><span>Üyenin aktif olarak ödünç aldığı toplam <strong>{{ member.activeLoanCount }} kitap</strong> bulunuyor.</span></div>
+            <div class="member-alert" [class.danger]="member.overdueLoanCount > 0" [class.clear]="member.overdueLoanCount === 0"><mat-icon>{{ member.overdueLoanCount > 0 ? 'warning' : 'check_circle' }}</mat-icon><span>Bu kitaplardan <strong>{{ member.overdueLoanCount }} tanesinin</strong> iade tarihi geçmiş.</span></div>
+          </div>
+        }
         @else { <form class="search-row" (ngSubmit)="searchMembers()"><mat-form-field appearance="outline" subscriptSizing="dynamic"><mat-label>Üye ara</mat-label><mat-icon matPrefix>search</mat-icon><input matInput [value]="memberSearch()" (input)="memberSearch.set($any($event.target).value)" /></mat-form-field><button mat-stroked-button type="submit" [disabled]="!memberSearch().trim()">Ara</button></form>@if (memberSearchPerformed()) { <div class="member-results">@if (loadingMembers()) { <p>Üyeler yükleniyor…</p> } @else { @for (member of members(); track member.id) { <button type="button" (click)="selectMember(member)"><span class="avatar">{{ initials(member) }}</span><span><strong>{{ member.firstName }} {{ member.lastName }}</strong><small>{{ member.email }}</small></span><mat-icon>chevron_right</mat-icon></button> } @empty { <p>Eşleşen üye bulunamadı.</p> } }</div> } }
       </section>
 
       <section class="workflow-card" [class.disabled]="!selectedMember()">
         <header><span>2</span><div><h2>Nüshayı okutun</h2><p>Kitabın üzerindeki envanter numarasını girin.</p></div></header>
-        <form class="inventory-entry" (ngSubmit)="lookupCopy()"><mat-form-field appearance="outline" subscriptSizing="dynamic"><mat-label>Envanter numarası</mat-label><mat-icon matPrefix>qr_code_scanner</mat-icon><input matInput [disabled]="!selectedMember()" [value]="inventoryNumber()" (input)="inventoryNumber.set($any($event.target).value); selectedCopy.set(null)" placeholder="TOFAS-KTP-00001" /></mat-form-field><button mat-flat-button type="submit" [disabled]="!selectedMember() || !inventoryNumber().trim() || checkingCopy()">Kontrol et</button></form>
-        @if (selectedCopy(); as copy) { <div class="copy-result" [class.unavailable]="copy.status !== 'AVAILABLE'"><mat-icon>{{ copy.status === 'AVAILABLE' ? 'check_circle' : 'block' }}</mat-icon><div><strong>{{ copy.book.title }}</strong><span>{{ copy.inventoryNumber }} · {{ copy.physicalLocation || 'Konum belirtilmemiş' }}</span><small>{{ copy.status === 'AVAILABLE' ? 'Ödünç verilebilir' : 'Bu nüsha şu anda ödünç verilemez' }}</small></div></div> }
+        <form class="inventory-entry" (ngSubmit)="lookupCopy()"><mat-form-field appearance="outline" subscriptSizing="dynamic"><mat-label>Envanter numarası</mat-label><mat-icon matPrefix>qr_code_scanner</mat-icon><input matInput [disabled]="!selectedMember()" [value]="inventoryNumber()" (input)="inventoryNumber.set($any($event.target).value); setSelectedCopy(null); copyError.set('')" placeholder="TOFAS-KTP-00001" /></mat-form-field><button mat-flat-button type="submit" [disabled]="!selectedMember() || !inventoryNumber().trim() || checkingCopy()">Kontrol et</button></form>
+        @if (copyError()) { <div class="copy-error"><mat-icon>error_outline</mat-icon><span>{{ copyError() }}</span></div> }
+        @if (selectedCopy(); as copy) {
+          <article class="copy-result" [class.unavailable]="copy.status !== 'AVAILABLE'">
+            <div class="copy-cover">@if (coverUrl(copy); as cover) { <img [src]="cover" [alt]="copy.book.title + ' kapağı'" /> } @else { <span>{{ copy.book.title.charAt(0) }}</span> }</div>
+            <div class="copy-details">
+              <div class="copy-title"><div><strong>{{ copy.book.title }}</strong><small>{{ authorNames() }}</small></div><span class="copy-status"><mat-icon>{{ copy.status === 'AVAILABLE' ? 'check_circle' : 'block' }}</mat-icon>{{ statusLabel(copy) }}</span></div>
+              <dl><div><dt>Yayınevi</dt><dd>{{ publisherName() }}</dd></div><div><dt>Fiziksel konum</dt><dd>{{ copy.physicalLocation || 'Konum belirtilmemiş' }}</dd></div></dl>
+              @if (copy.notes) { <div class="copy-note"><mat-icon>sticky_note_2</mat-icon><span>{{ copy.notes }}</span></div> }
+              @if (copy.status === 'LOANED') {
+                @if (selectedCopyLoan(); as loan) {
+                  <section class="copy-loan" [class.overdue]="loan.overdue">
+                    <header><mat-icon>{{ loan.overdue ? 'warning' : 'schedule' }}</mat-icon><strong>{{ loan.overdue ? overdueDays(loan) + ' gün gecikmiş' : 'Aktif ödünç kaydı' }}</strong></header>
+                    <div class="loan-member"><mat-icon>person</mat-icon><strong>{{ loan.member.firstName }} {{ loan.member.lastName }}</strong><span>{{ loan.member.email }}</span></div>
+                    <dl><div><dt>Ödünç tarihi</dt><dd>{{ formatDate(loan.checkoutDate) }}</dd></div><div><dt>Son iade tarihi</dt><dd>{{ formatDate(loan.dueDate) }}</dd></div></dl>
+                  </section>
+                } @else if (loadingCopyLoan()) { <div class="loan-loading"><mat-icon>hourglass_top</mat-icon>Ödünç kaydı yükleniyor…</div> }
+                @else { <div class="loan-loading unavailable-detail"><mat-icon>info</mat-icon>Aktif ödünç kaydının ayrıntıları alınamadı.</div> }
+              }
+            </div>
+          </article>
+        }
       </section>
 
       <section class="confirmation-card"><div><h2>İşlemi onaylayın</h2><p>Ödünç verme süresi sistem politikaları gereği 14 gün olarak ayarlanmıştır.</p></div><button mat-flat-button type="button" [disabled]="!selectedMember() || selectedCopy()?.status !== 'AVAILABLE' || submitting()" (click)="checkout()">{{ submitting() ? 'İşleniyor…' : 'Ödünç ver' }}</button></section>
