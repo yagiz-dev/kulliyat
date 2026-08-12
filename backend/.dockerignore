@@ -1,0 +1,6 @@
+.mvn
+target
+.env
+.git
+.gitignore
+Dockerfile

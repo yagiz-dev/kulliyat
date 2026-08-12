@@ -1,36 +1,31 @@
-POST http://localhost:8080/api/publishers
+# Külliyat
 
-```json
-{
-  "name": "Türkiye İş Bankası Kültür Yayınları"
-}
+Spring ve Angular öğrenmek için yazdığım kütüphane projesi.
+
+## Docker ile çalıştırma
+
+Docker Compose kullanarak hızlıca Spring Boot backendini, Angular uygulamasını ve MySQL 8.4 veritabanını kaldırabilirsiniz.
+
+Docker kullandığınızda veritabanı boşsa test verisiyle doldurulacaktır.
+
+1. .env dosyasını oluşturun ve düzenleyin
+3. `docker compose up --build`
+4. `http://localhost:8080`
+
+Frontend nginx proxy kullanarak `/api`'ı backend'e yönlendiriyor. Backend ve veritabanına erişim sadece Compose'dan oluşturduğumuz sanal networkten erişilebiliyor, yani dışarıdan sadece frontend'e erişilebiliyor.
+
+Veritabanını test verisiyle tekrar oluşturmak için mysql-data volumw'ünü silip uygulamayı tekrar başlatabilirsiniz.
+
+```powershell
+docker compose down
+docker volume rm kulliyat_mysql-data
+docker compose up --build
 ```
 
-POST http://localhost:8080/api/authors
+### JWT secret oluşturma
 
-```json
-{
-  "name": "Grigoriy Petrov"
-}
-```
+Aşağıdaki kodu PowerShell'de oluşturup aldığınız secret'ı .env'deki JWT_SECRET alanında kullanabilirsniiz.
 
-POST http://localhost:8080/api/books
-
-```json
-{
-  "title": "Beyaz Zambaklar Ülkesinde",
-  "isbn": "978-6254053702",
-  "publicationYear": 2021,
-  "summary": "Beyaz Zambaklar Ülkesinde, Rus yazar Grigory Petrov tarafından 1923 yılında kaleme alınmış; Finlandiya halkının cehaletten, yoksulluktan ve bataklıklardan kurtulup eğitimle, iradeyle modern bir medeniyet kurma mücadelesini anlatan ilham verici bir eserdir.",
-  "genre": "TARIH",
-  "cover_image_url": "https://img.iskultur.com.tr/webp/2021/04/beya-zambaklar-ulkesinde-256x420.jpg",
-  "publisher": {
-    "id": 1
-  },
-  "authors": [
-    {
-      "id": 1
-    }
-  ]
-}
+```powershell
+$bytes = New-Object byte[] 32; $rng = [Security.Cryptography.RandomNumberGenerator]::Create(); $rng.GetBytes($bytes); $rng.Dispose(); [Convert]::ToBase64String($bytes)
 ```
