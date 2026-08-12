@@ -20,6 +20,7 @@ import org.springframework.data.domain.Page;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.function.Function;
 
@@ -107,6 +108,10 @@ public final class ApiDtos {
                                            long loanedCopies, long maintenanceCopies, long lostCopies,
                                            long totalMembers, long activeLoans, long overdueLoans,
                                            List<LoanResponse> recentLoans) {}
+
+    public record SystemInfoResponse(String environment, OffsetDateTime startedAt, OffsetDateTime serverTime,
+                                     long uptimeSeconds, String timeZone, String javaVersion,
+                                     String springBootVersion, String databaseProduct, String databaseVersion) {}
 
     public record StaffResponse(Long id, String username, String firstName, String lastName, String role) {
         public static StaffResponse from(Staff staff) {
