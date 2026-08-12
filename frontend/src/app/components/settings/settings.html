@@ -1,0 +1,24 @@
+<section class="settings-page">
+  <header class="settings-header">
+    <h1>Sistem bilgileri</h1>
+  </header>
+
+  @if (error()) {
+    <p class="error-message">Sistem bilgileri alınamadı: {{ error() }}</p>
+  }
+
+  <h2>Uygulama ortamı</h2>
+  <dl class="environment-list">
+    <div><dt>Çalışma ortamı</dt><dd class="environment-value">@if (isDocker(info()?.environment)) { <mat-icon aria-hidden="true">view_in_ar</mat-icon> }{{ info() ? environmentLabel(info()!.environment) : 'Yükleniyor…' }}</dd></div>
+    <div><dt>Başlatılma zamanı</dt><dd>{{ info()?.startedAt ? (info()!.startedAt | date:'dd.MM.yyyy HH:mm:ss') : '—' }}</dd></div>
+    <div><dt>Çalışma süresi</dt><dd>{{ info() ? formatUptime(info()!.uptimeSeconds) : '—' }}</dd></div>
+    <div><dt>Sunucu saati</dt><dd>{{ info()?.serverTime ? (info()!.serverTime | date:'dd.MM.yyyy HH:mm:ss') : '—' }} @if (info()?.timeZone) { <span class="secondary">({{ info()!.timeZone }})</span> }</dd></div>
+  </dl>
+
+  <h2>Runtime sürümleri</h2>
+  <dl class="environment-list">
+    <div><dt>Java</dt><dd>{{ info()?.javaVersion || '—' }}</dd></div>
+    <div><dt>Spring Boot</dt><dd>{{ info()?.springBootVersion || '—' }}</dd></div>
+    <div><dt>Veritabanı</dt><dd>{{ info() ? info()!.databaseProduct + ' (' + info()!.databaseVersion + ')' : '—' }}</dd></div>
+  </dl>
+</section>

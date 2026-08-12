@@ -21,7 +21,7 @@ export const routes: Routes = [
       { path: 'members', data: { title: 'Üyeler' }, loadComponent: () => import('./components/members/members').then((m) => m.MembersComponent) },
       { path: 'reports', data: { title: 'Raporlar' }, loadComponent: placeholder },
       { path: 'administration/staff', canActivate: [adminGuard], data: { title: 'Yöneticiler' }, loadComponent: placeholder },
-      { path: 'administration/settings', canActivate: [adminGuard], data: { title: 'Ayarlar' }, loadComponent: placeholder },
+      { path: 'administration/settings', canActivate: [adminGuard], data: { title: 'Sistem ve ortam' }, loadComponent: () => import('./components/settings/settings').then((m) => m.SettingsComponent) },
     ],
   },
   { path: '**', redirectTo: '' },
