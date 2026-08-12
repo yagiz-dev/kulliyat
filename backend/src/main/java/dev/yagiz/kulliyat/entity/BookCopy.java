@@ -2,9 +2,13 @@ package dev.yagiz.kulliyat.entity;
 
 import dev.yagiz.kulliyat.enums.CopyStatus;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "book_copies")
+@Getter
+@Setter
 public class BookCopy {
 
     @Id
@@ -28,53 +32,5 @@ public class BookCopy {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_id", nullable = false)
     private Book book;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getInventoryNumber() {
-        return inventoryNumber;
-    }
-
-    public void setInventoryNumber(String inventoryNumber) {
-        this.inventoryNumber = inventoryNumber;
-    }
-
-    public String getPhysicalLocation() {
-        return physicalLocation;
-    }
-
-    public void setPhysicalLocation(String physicalLocation) {
-        this.physicalLocation = physicalLocation;
-    }
-
-    public String getNotes() {
-        return notes;
-    }
-
-    public void setNotes(String notes) {
-        this.notes = notes;
-    }
-
-    public CopyStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(CopyStatus status) {
-        this.status = status;
-    }
-
-    public Book getBook() {
-        return book;
-    }
-
-    public void setBook(Book book) {
-        this.book = book;
-    }
 
 }

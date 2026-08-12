@@ -1,10 +1,14 @@
 package dev.yagiz.kulliyat.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "loans")
+@Getter
+@Setter
 public class Loan {
 
     @Id
@@ -31,61 +35,5 @@ public class Loan {
     // Kitabı ödünç veren Staff'ın kullanıcı adı
     @Column(nullable = false)
     private String issuedBy;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public BookCopy getBookCopy() {
-        return bookCopy;
-    }
-
-    public void setBookCopy(BookCopy bookCopy) {
-        this.bookCopy = bookCopy;
-    }
-
-    public Member getMember() {
-        return member;
-    }
-
-    public void setMember(Member member) {
-        this.member = member;
-    }
-
-    public LocalDate getCheckoutDate() {
-        return checkoutDate;
-    }
-
-    public void setCheckoutDate(LocalDate checkoutDate) {
-        this.checkoutDate = checkoutDate;
-    }
-
-    public LocalDate getDueDate() {
-        return dueDate;
-    }
-
-    public void setDueDate(LocalDate dueDate) {
-        this.dueDate = dueDate;
-    }
-
-    public LocalDate getReturnDate() {
-        return returnDate;
-    }
-
-    public void setReturnDate(LocalDate returnDate) {
-        this.returnDate = returnDate;
-    }
-
-    public String getIssuedBy() {
-        return issuedBy;
-    }
-
-    public void setIssuedBy(String issuedBy) {
-        this.issuedBy = issuedBy;
-    }
 
 }

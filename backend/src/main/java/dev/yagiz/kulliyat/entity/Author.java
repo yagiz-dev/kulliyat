@@ -2,11 +2,16 @@ package dev.yagiz.kulliyat.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "authors")
+@Getter
+@Setter
 public class Author {
 
     @Id
@@ -18,26 +23,7 @@ public class Author {
 
     @JsonIgnore // Serializer sonsuz döngüye girmesin diye json output ederken burayı pas geçiyoruz.
     @ManyToMany(mappedBy = "authors")
+    @Setter(AccessLevel.NONE)
     private List<Book> books = new ArrayList<>();
 
-    // Getter ve setter'lar
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public List<Book> getBooks() {
-        return books;
-    }
 }
